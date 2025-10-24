@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三兄弟的冒险2 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-title {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-subtitle {
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .tab-button.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+            display: block;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .help-text {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .character-icons {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 20px;
+            letter-spacing: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="character-icons">🐱🐶🐢</div>
+        <h1 class="game-title">三兄弟的冒险2</h1>
+        <p class="game-subtitle">The Adventure of Three Brothers</p>
+
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('login')">登录</button>
+            <button class="tab-button" onclick="switchTab('register')">注册</button>
+        </div>
+
+        <!-- 登录表单 -->
+        <div id="loginForm" class="form-container active">
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">用户名</label>
+                    <input
+                        type="text"
+                        id="loginUsername"
+                        placeholder="请输入用户名"
+                        required
+                        autocomplete="username"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="请输入密码"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                <button type="submit" class="submit-button" id="loginButton">
+                    登录
+                </button>
+            </form>
+            <div id="loginMessage" class="message"></div>
+        </div>
+
+        <!-- 注册表单 -->
+        <div id="registerForm" class="form-container">
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="registerUsername">用户名</label>
+                    <input
+                        type="text"
+                        id="registerUsername"
+                        placeholder="请输入用户名（3-20字符）"
+                        required
+                        minlength="3"
+                        maxlength="20"
+                        autocomplete="username"
+                    >
+                    <div class="help-text">用户名将用于游戏内识别</div>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">密码</label>
+                    <input
+                        type="password"
+                        id="registerPassword"
+                        placeholder="请输入密码（至少6位）"
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="registerPasswordConfirm">确认密码</label>
+                    <input
+                        type="password"
+                        id="registerPasswordConfirm"
+                        placeholder="请再次输入密码"
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                    >
+                </div>
+                <button type="submit" class="submit-button" id="registerButton">
+                    注册
+                </button>
+            </form>
+            <div id="registerMessage" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时检查是否已登录
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // 验证token是否有效
+                verifyToken(token);
+            }
+        });
+
+        // 切换登录/注册标签
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabButtons = document.querySelectorAll('.tab-button');
+
+            if (tab === 'login') {
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+                tabButtons[0].classList.add('active');
+                tabButtons[1].classList.remove('active');
+            } else {
+                loginForm.classList.remove('active');
+                registerForm.classList.add('active');
+                tabButtons[0].classList.remove('active');
+                tabButtons[1].classList.add('active');
+            }
+
+            // 清空消息
+            document.getElementById('loginMessage').className = 'message';
+            document.getElementById('registerMessage').className = 'message';
+        }
+
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const button = document.getElementById('loginButton');
+            const messageEl = document.getElementById('loginMessage');
+
+            button.disabled = true;
+            button.textContent = '登录中...';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // 保存token到localStorage
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('username', username);
+
+                    showMessage(messageEl, '登录成功！正在跳转...', 'success');
+
+                    // 跳转到游戏页面
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showMessage(messageEl, data.error || '登录失败', 'error');
+                    button.disabled = false;
+                    button.textContent = '登录';
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                showMessage(messageEl, '网络错误，请稍后重试', 'error');
+                button.disabled = false;
+                button.textContent = '登录';
+            }
+        }
+
+        // 处理注册
+        async function handleRegister(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            const button = document.getElementById('registerButton');
+            const messageEl = document.getElementById('registerMessage');
+
+            // 验证密码匹配
+            if (password !== passwordConfirm) {
+                showMessage(messageEl, '两次输入的密码不一致', 'error');
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = '注册中...';
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(messageEl, '注册成功！请登录', 'success');
+
+                    // 3秒后切换到登录表单并填充用户名
+                    setTimeout(() => {
+                        switchTab('login');
+                        document.getElementById('loginUsername').value = username;
+                        document.getElementById('loginPassword').focus();
+                    }, 1500);
+                } else {
+                    showMessage(messageEl, data.error || '注册失败', 'error');
+                    button.disabled = false;
+                    button.textContent = '注册';
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                showMessage(messageEl, '网络错误，请稍后重试', 'error');
+                button.disabled = false;
+                button.textContent = '注册';
+            }
+        }
+
+        // 验证token有效性
+        async function verifyToken(token) {
+            try {
+                const response = await fetch('/api/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    // Token有效，直接跳转到游戏页面
+                    window.location.href = '/';
+                } else {
+                    // Token无效，清除本地存储
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('username');
+                }
+            } catch (error) {
+                console.error('Token验证错误:', error);
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('username');
+            }
+        }
+
+        // 显示消息
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `message ${type}`;
+        }
+    </script>
+</body>
+</html>

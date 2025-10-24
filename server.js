@@ -9,6 +9,7 @@ const io = require('socket.io')(http, {
 });
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 // 加载游戏数据
 const sceneData = JSON.parse(
@@ -18,9 +19,123 @@ const sceneData = JSON.parse(
 // 存储所有房间的数据
 const rooms = {};
 
+// 用户账号存储 { username: { password, currentRoomId, currentPlayerId, lastActive } }
+const users = {};
+
+// Token会话存储 { token: { username, createdAt } }
+const sessions = {};
+
 // 提供静态文件
 app.use(express.static('public'));
 app.use('/data', express.static('data'));
+
+// JSON body parser
+app.use(express.json());
+
+// 生成随机token
+function generateToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+// 验证token
+function verifyToken(token) {
+  const session = sessions[token];
+  if (!session) return null;
+
+  // Token有效期24小时
+  const tokenAge = Date.now() - session.createdAt;
+  if (tokenAge > 24 * 60 * 60 * 1000) {
+    delete sessions[token];
+    return null;
+  }
+
+  return session.username;
+}
+
+// 注册API
+app.post('/api/register', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: '用户名和密码不能为空' });
+  }
+
+  if (username.length < 3 || username.length > 20) {
+    return res.status(400).json({ error: '用户名长度必须在3-20个字符之间' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: '密码长度至少为6个字符' });
+  }
+
+  if (users[username]) {
+    return res.status(409).json({ error: '用户名已存在' });
+  }
+
+  // 创建用户（注意：生产环境应该hash密码）
+  users[username] = {
+    password: password,
+    currentRoomId: null,
+    currentPlayerId: null,
+    lastActive: Date.now()
+  };
+
+  console.log(`新用户注册: ${username}`);
+  res.json({ success: true, message: '注册成功' });
+});
+
+// 登录API
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: '用户名和密码不能为空' });
+  }
+
+  const user = users[username];
+  if (!user || user.password !== password) {
+    return res.status(401).json({ error: '用户名或密码错误' });
+  }
+
+  // 生成token
+  const token = generateToken();
+  sessions[token] = {
+    username: username,
+    createdAt: Date.now()
+  };
+
+  user.lastActive = Date.now();
+
+  console.log(`用户登录: ${username}`);
+  res.json({
+    success: true,
+    token: token,
+    username: username,
+    currentRoomId: user.currentRoomId
+  });
+});
+
+// 验证token API
+app.post('/api/verify', (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token缺失' });
+  }
+
+  const token = authHeader.substring(7);
+  const username = verifyToken(token);
+
+  if (!username) {
+    return res.status(401).json({ error: 'Token无效或已过期' });
+  }
+
+  const user = users[username];
+  res.json({
+    success: true,
+    username: username,
+    currentRoomId: user.currentRoomId
+  });
+});
 
 // 主页
 app.get('/', (req, res) => {
@@ -180,9 +295,98 @@ function applyEffect(effect, gameState, players, roomId, io) {
 io.on('connection', (socket) => {
   console.log('用户连接:', socket.id);
 
+  let authenticatedUsername = null;
+
+  // Socket认证
+  socket.on('authenticate', (data) => {
+    const { token } = data;
+    const username = verifyToken(token);
+
+    if (!username) {
+      socket.emit('authError', { message: 'Token无效或已过期，请重新登录' });
+      return;
+    }
+
+    authenticatedUsername = username;
+    const user = users[username];
+
+    socket.emit('authenticated', {
+      username: username,
+      currentRoomId: user.currentRoomId,
+      currentPlayerId: user.currentPlayerId
+    });
+
+    console.log(`用户认证成功: ${username}`);
+  });
+
+  // 重新连接到之前的房间
+  socket.on('reconnectToRoom', (data) => {
+    const { token } = data;
+    const username = verifyToken(token);
+
+    if (!username) {
+      socket.emit('reconnectError', { message: 'Token无效，请重新登录' });
+      return;
+    }
+
+    const user = users[username];
+    if (!user.currentRoomId || !user.currentPlayerId) {
+      socket.emit('reconnectError', { message: '没有找到之前的房间' });
+      return;
+    }
+
+    const roomId = user.currentRoomId;
+    const playerId = user.currentPlayerId;
+
+    if (!rooms[roomId]) {
+      // 房间已不存在
+      user.currentRoomId = null;
+      user.currentPlayerId = null;
+      socket.emit('reconnectError', { message: '房间已不存在' });
+      return;
+    }
+
+    const room = rooms[roomId];
+    const player = room.players[playerId];
+
+    if (!player) {
+      socket.emit('reconnectError', { message: '玩家数据已丢失' });
+      return;
+    }
+
+    // 更新socket ID
+    player.socketId = socket.id;
+    player.connected = true;
+    socket.join(roomId);
+
+    // 发送房间数据
+    socket.emit('reconnected', {
+      roomId: roomId,
+      playerId: playerId,
+      players: room.players,
+      gameState: room.gameState,
+      sceneData: sceneData
+    });
+
+    // 通知其他玩家
+    socket.to(roomId).emit('playerReconnected', {
+      playerId: playerId,
+      playerName: player.name
+    });
+
+    console.log(`用户 ${username} 重连到房间 ${roomId}`);
+  });
+
   // 创建房间
   socket.on('createRoom', (data) => {
-    const { roomId, playerName, playerId, character } = data;
+    const { roomId, playerName, playerId, character, token } = data;
+
+    // 验证token
+    const username = token ? verifyToken(token) : null;
+    if (!username) {
+      socket.emit('error', { message: '未登录，请先登录' });
+      return;
+    }
 
     rooms[roomId] = {
       players: {},
@@ -197,8 +401,15 @@ io.on('connection', (socket) => {
       hp: character.maxHp,
       maxHp: character.maxHp,
       socketId: socket.id,
-      canMove: character.id === 'turtle' // 初始只有乌龟能行动
+      canMove: character.id === 'turtle', // 初始只有乌龟能行动
+      connected: true,
+      username: username
     };
+
+    // 记录用户当前房间
+    const user = users[username];
+    user.currentRoomId = roomId;
+    user.currentPlayerId = playerId;
 
     socket.join(roomId);
     socket.emit('roomCreated', {
@@ -208,12 +419,19 @@ io.on('connection', (socket) => {
       sceneData: sceneData
     });
 
-    console.log(`房间 ${roomId} 已创建，玩家: ${playerName} (${character.name})`);
+    console.log(`房间 ${roomId} 已创建，玩家: ${playerName} (${character.name}), 用户: ${username}`);
   });
 
   // 加入房间
   socket.on('joinRoom', (data) => {
-    const { roomId, playerName, playerId, character } = data;
+    const { roomId, playerName, playerId, character, token } = data;
+
+    // 验证token
+    const username = token ? verifyToken(token) : null;
+    if (!username) {
+      socket.emit('error', { message: '未登录，请先登录' });
+      return;
+    }
 
     if (!rooms[roomId]) {
       socket.emit('error', { message: '房间不存在' });
@@ -242,8 +460,15 @@ io.on('connection', (socket) => {
       hp: character.maxHp,
       maxHp: character.maxHp,
       socketId: socket.id,
-      canMove: character.id === 'turtle'
+      canMove: character.id === 'turtle',
+      connected: true,
+      username: username
     };
+
+    // 记录用户当前房间
+    const user = users[username];
+    user.currentRoomId = roomId;
+    user.currentPlayerId = playerId;
 
     socket.join(roomId);
 
@@ -254,7 +479,7 @@ io.on('connection', (socket) => {
       sceneData: sceneData
     });
 
-    console.log(`玩家 ${playerName} (${character.name}) 加入房间 ${roomId}`);
+    console.log(`玩家 ${playerName} (${character.name}) 加入房间 ${roomId}, 用户: ${username}`);
   });
 
   // 开始游戏
@@ -451,20 +676,45 @@ io.on('connection', (socket) => {
       );
 
       if (playerId) {
-        const playerName = players[playerId].name;
-        delete players[playerId];
+        const player = players[playerId];
+        const playerName = player.name;
 
-        if (Object.keys(players).length === 0) {
-          delete rooms[roomId];
-          console.log(`房间 ${roomId} 已删除（无玩家）`);
-        } else {
-          io.to(roomId).emit('playerLeft', {
-            playerId,
-            playerName,
-            players: rooms[roomId].players
-          });
-          console.log(`玩家 ${playerName} 离开房间 ${roomId}`);
-        }
+        // 标记为断线状态，而不是直接删除
+        player.connected = false;
+        player.disconnectTime = Date.now();
+
+        // 通知其他玩家
+        socket.to(roomId).emit('playerDisconnected', {
+          playerId,
+          playerName
+        });
+
+        console.log(`玩家 ${playerName} 从房间 ${roomId} 断开连接（可重连）`);
+
+        // 30分钟后如果还未重连，则删除玩家
+        setTimeout(() => {
+          if (rooms[roomId] && players[playerId] && !players[playerId].connected) {
+            delete players[playerId];
+
+            // 清除用户的房间记录
+            if (player.username && users[player.username]) {
+              users[player.username].currentRoomId = null;
+              users[player.username].currentPlayerId = null;
+            }
+
+            if (Object.keys(players).length === 0) {
+              delete rooms[roomId];
+              console.log(`房间 ${roomId} 已删除（无玩家）`);
+            } else {
+              io.to(roomId).emit('playerLeft', {
+                playerId,
+                playerName,
+                players: rooms[roomId].players
+              });
+              console.log(`玩家 ${playerName} 超时未重连，已从房间 ${roomId} 移除`);
+            }
+          }
+        }, 30 * 60 * 1000); // 30分钟
       }
     });
   });
