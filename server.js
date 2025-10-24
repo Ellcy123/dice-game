@@ -547,14 +547,8 @@ io.on('connection', (socket) => {
       const match = keywords.some(kw => kw.toLowerCase() === normalizedKeyword);
 
       if (match && !room.gameState.usedInteractions.includes(interaction.keyword)) {
-        // 检查玩家是否可以触发
-        if (!canPlayerTrigger(interaction, playerRole)) {
-          socket.emit('keywordResult', {
-            success: false,
-            message: '这个操作不适合你的角色！'
-          });
-          return;
-        }
+        // 移除角色限制 - 所有可行动的玩家都可以执行任何关键词
+        // 根据游戏规则，关键词如"水潭+龟"是指让龟去探索水潭，而不是限制只有龟玩家才能输入
 
         // 检查条件
         if (!checkCondition(interaction.condition, room.gameState, playerRole)) {
