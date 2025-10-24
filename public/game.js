@@ -51,10 +51,17 @@ function initSocket() {
 
     socket.on('connect', () => {
         console.log('已连接到服务器');
+
+        // 尝试重连到之前的房间
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            socket.emit('reconnectToRoom', { token });
+        }
     });
 
     socket.on('disconnect', () => {
         console.log('与服务器断开连接');
+        addStoryEntry('系统', '⚠️ 与服务器断开连接，正在尝试重连...');
     });
 
     socket.on('roomCreated', (data) => {
@@ -119,6 +126,55 @@ function initSocket() {
     socket.on('error', (data) => {
         alert(data.message);
     });
+
+    // 重连成功
+    socket.on('reconnected', (data) => {
+        console.log('重连成功:', data);
+        roomId = data.roomId;
+        myId = data.playerId;
+        players = data.players;
+        gameState = data.gameState;
+        sceneData = data.sceneData;
+
+        // 设置玩家信息
+        const myPlayer = players[myId];
+        if (myPlayer) {
+            myName = myPlayer.name;
+            selectedCharacter = myPlayer.character;
+        }
+
+        // 显示游戏界面
+        showGameScreen();
+
+        // 如果游戏已经开始，显示游戏场景
+        if (gameState.gamePhase === 'room-escape') {
+            document.getElementById('waitingScreen').style.display = 'none';
+            document.getElementById('gameSceneScreen').style.display = 'flex';
+            document.getElementById('controlsPanel').style.display = 'block';
+
+            // 渲染场景
+            renderScene();
+            updateUI();
+        }
+
+        addStoryEntry('系统', '✅ 重新连接成功！');
+    });
+
+    // 重连失败
+    socket.on('reconnectError', (data) => {
+        console.log('重连失败:', data.message);
+        // 重连失败时不显示错误，让用户正常创建/加入房间
+    });
+
+    // 其他玩家重连
+    socket.on('playerReconnected', (data) => {
+        addStoryEntry('系统', `${data.playerName} 重新连接`);
+    });
+
+    // 其他玩家断线
+    socket.on('playerDisconnected', (data) => {
+        addStoryEntry('系统', `${data.playerName} 断开连接`);
+    });
 }
 
 // 角色选择
@@ -161,6 +217,13 @@ function createRoom() {
         return;
     }
 
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('未登录，请先登录！');
+        window.location.href = '/login.html';
+        return;
+    }
+
     myName = nameInput.value.trim();
     myId = generatePlayerId();
     const newRoomId = generateRoomId();
@@ -169,7 +232,8 @@ function createRoom() {
         roomId: newRoomId,
         playerName: myName,
         playerId: myId,
-        character: selectedCharacter
+        character: selectedCharacter,
+        token: token
     });
 }
 
@@ -187,6 +251,13 @@ function joinRoom() {
         return;
     }
 
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('未登录，请先登录！');
+        window.location.href = '/login.html';
+        return;
+    }
+
     myName = nameInput.value.trim();
     myId = generatePlayerId();
     roomId = roomInput.value.trim().toUpperCase();
@@ -195,7 +266,8 @@ function joinRoom() {
         roomId: roomId,
         playerName: myName,
         playerId: myId,
-        character: selectedCharacter
+        character: selectedCharacter,
+        token: token
     });
 
     setTimeout(() => {
@@ -469,4 +541,21 @@ function copyRoomId() {
     }).catch(() => {
         prompt('复制这个房间ID分享给朋友:', roomId);
     });
+}
+
+// 退出登录
+function logout() {
+    if (confirm('确定要退出登录吗？当前游戏进度将保存，下次登录可继续。')) {
+        // 清除本地存储的token
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('username');
+
+        // 断开socket连接
+        if (socket) {
+            socket.disconnect();
+        }
+
+        // 跳转到登录页面
+        window.location.href = '/login.html';
+    }
 }

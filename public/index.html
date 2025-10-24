@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>三兄弟的冒险2 - 密室逃脱</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // 检查登录状态
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                // 未登录，跳转到登录页面
+                window.location.href = '/login.html';
+            }
+        });
+    </script>
     <style>
         * {
             margin: 0;
@@ -609,6 +619,7 @@
                 <div class="room-info">
                     房间ID: <span class="room-id" id="roomIdDisplay" onclick="copyRoomId()">------</span>
                     <span id="playerCountDisplay"></span>
+                    <button onclick="logout()" style="margin-left: 15px; padding: 5px 12px; font-size: 12px; background: rgba(200, 50, 50, 0.8); border: 1px solid #c44; cursor: pointer; border-radius: 4px;">退出登录</button>
                 </div>
             </div>
 
