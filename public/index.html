@@ -154,6 +154,15 @@
                 </div>
             </div>
 
+            <!-- 角色选择区域 -->
+            <div id="characterSelectContainer" class="mb-6 bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-6 border border-white border-opacity-20 hidden">
+                <h2 class="text-2xl font-bold text-white mb-4 text-center">⚔️ 选择你的角色</h2>
+                <div id="characterGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <!-- 角色卡片将动态添加 -->
+                </div>
+                <p class="text-gray-300 text-sm text-center" id="characterSelectHint">请选择一个角色</p>
+            </div>
+
             <!-- 开始游戏按钮 -->
             <div id="startGameContainer" class="mb-6 text-center hidden">
                 <button
@@ -162,7 +171,7 @@
                 >
                     🎮 开始游戏
                 </button>
-                <p class="text-gray-300 text-sm mt-2">等待所有玩家准备...</p>
+                <p class="text-gray-300 text-sm mt-2" id="startGameHint">等待所有玩家选择角色...</p>
             </div>
 
             <!-- BOSS区域 -->
@@ -254,6 +263,7 @@
         let boss = null;
         let gameStarted = false;
         let gameOver = false;
+        let characters = {};
 
         const colors = [
             'bg-blue-600',
@@ -280,6 +290,7 @@
                 players = data.players;
                 boss = data.boss;
                 gameStarted = data.gameStarted;
+                characters = data.characters;
                 showGameScreen();
             });
 
@@ -287,7 +298,16 @@
                 players = data.players;
                 boss = data.boss;
                 gameStarted = data.gameStarted;
+                if (data.characters) characters = data.characters;
                 updateUI();
+            });
+
+            socket.on('characterSelected', (data) => {
+                players = data.players;
+                updateUI();
+                if (data.playerId === myId) {
+                    showNotification(`你选择了 ${data.character.name} ${data.character.icon}`);
+                }
             });
 
             socket.on('gameStarted', (data) => {
@@ -429,17 +449,73 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('gameScreen').classList.remove('hidden');
             document.getElementById('roomIdText').textContent = roomId;
+            renderCharacterSelection();
             updateUI();
+        }
+
+        function selectCharacter(characterId) {
+            if (gameStarted) {
+                alert('游戏已开始，无法更改角色！');
+                return;
+            }
+
+            socket.emit('selectCharacter', {
+                roomId: roomId,
+                playerId: myId,
+                characterId: characterId
+            });
+        }
+
+        function renderCharacterSelection() {
+            const grid = document.getElementById('characterGrid');
+            grid.innerHTML = '';
+
+            Object.values(characters).forEach(char => {
+                const card = document.createElement('div');
+                card.className = 'bg-white bg-opacity-10 rounded-xl p-4 cursor-pointer hover:bg-opacity-20 transition-all border-2 border-white border-opacity-20 hover:border-opacity-50';
+                card.onclick = () => selectCharacter(char.id);
+
+                card.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-5xl mb-2">${char.icon}</div>
+                        <h3 class="text-xl font-bold text-white mb-2">${char.name}</h3>
+                        <div class="text-sm text-gray-300 mb-2">
+                            <span class="bg-red-500 bg-opacity-30 px-2 py-1 rounded">HP: ${char.maxHp}</span>
+                        </div>
+                        <p class="text-xs text-gray-400">${char.description}</p>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
         }
 
         function updateUI() {
             const playersList = Object.values(players);
             document.getElementById('playerCount').textContent = `👥 ${playersList.length}/3 位勇士`;
 
-            // 显示开始游戏按钮（房主且未开始游戏）
+            // 检查所有玩家是否都选择了角色
+            const allSelected = playersList.every(p => p.character !== null);
+            const myPlayer = players[myId];
+
+            // 显示/隐藏角色选择区域
+            const characterSelectContainer = document.getElementById('characterSelectContainer');
+            if (!gameStarted && myPlayer && !myPlayer.character) {
+                characterSelectContainer.classList.remove('hidden');
+            } else {
+                characterSelectContainer.classList.add('hidden');
+            }
+
+            // 显示开始游戏按钮（房主且未开始游戏且所有人都选了角色）
             const startGameContainer = document.getElementById('startGameContainer');
+            const startGameHint = document.getElementById('startGameHint');
             if (!gameStarted && playersList.length > 0 && playersList[0].id === myId) {
                 startGameContainer.classList.remove('hidden');
+                if (allSelected) {
+                    startGameHint.textContent = '所有玩家已准备！点击开始游戏';
+                } else {
+                    startGameHint.textContent = '等待所有玩家选择角色...';
+                }
             } else {
                 startGameContainer.classList.add('hidden');
             }
@@ -464,18 +540,29 @@
                 const isMe = player.id === myId;
                 const color = colors[index % colors.length];
                 const card = document.createElement('div');
-                const hpPercent = (player.hp / player.maxHp) * 100;
+                const hpPercent = player.maxHp > 0 ? (player.hp / player.maxHp) * 100 : 0;
 
                 card.className = `${color} rounded-2xl p-4 shadow-2xl transform transition-all fade-in ${isMe ? 'ring-4 ring-yellow-400' : ''} ${player.isDead ? 'opacity-50 grayscale' : ''}`;
 
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-xl font-bold text-white truncate flex items-center gap-2">
+                            ${player.character ? player.character.icon : '❓'}
                             ${escapeHtml(player.name)}
                             ${player.isDead ? '💀' : ''}
                         </h2>
                         ${isMe ? '<span class="bg-yellow-400 text-gray-900 px-2 py-1 rounded-full text-xs font-bold">你</span>' : ''}
                     </div>
+
+                    ${player.character ? `
+                        <div class="mb-2 text-center">
+                            <span class="bg-white bg-opacity-20 px-2 py-1 rounded text-xs text-white">${player.character.name}</span>
+                        </div>
+                    ` : `
+                        <div class="mb-2 text-center">
+                            <span class="bg-yellow-500 bg-opacity-30 px-2 py-1 rounded text-xs text-yellow-200">未选择角色</span>
+                        </div>
+                    `}
 
                     <!-- 玩家血条 -->
                     <div class="mb-3">
@@ -540,7 +627,9 @@
                 logEntry.className = 'fade-in';
 
                 if (log.type === 'player_attack') {
-                    logEntry.innerHTML = `⚔️ <span class="text-yellow-300">${escapeHtml(log.playerName)}</span> 对BOSS造成 <span class="text-red-400">${log.damage}</span> 点伤害！BOSS剩余HP: <span class="text-orange-400">${log.bossHp}</span>`;
+                    const criticalText = log.isCritical ? '<span class="text-yellow-300 font-bold">【暴击！】</span>' : '';
+                    const diceInfo = log.diceResult ? ` (骰子: ${log.diceResult})` : '';
+                    logEntry.innerHTML = `⚔️ <span class="text-yellow-300">${escapeHtml(log.playerName)}</span> ${criticalText}对BOSS造成 <span class="text-red-400 font-bold">${log.damage}</span> 点伤害${diceInfo}！BOSS剩余HP: <span class="text-orange-400">${log.bossHp}</span>`;
                 } else if (log.type === 'boss_attack') {
                     logEntry.innerHTML = `💥 BOSS反击 <span class="text-yellow-300">${escapeHtml(log.targetName)}</span>，造成 <span class="text-red-400">${log.damage}</span> 点伤害！剩余HP: <span class="text-green-400">${log.targetHp}</span>`;
                 } else if (log.type === 'player_died') {
