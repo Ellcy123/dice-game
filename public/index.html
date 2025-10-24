@@ -3,739 +3,688 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>三人打BOSS - 骰子冒险</title>
+    <title>三兄弟的冒险2 - 密室逃脱</title>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .spinning {
-            animation: spin 0.5s linear;
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #d4d4d4;
+            overflow: hidden;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+        /* 登录界面 */
+        #loginScreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%);
         }
-        .pulse-animation {
-            animation: pulse 1s infinite;
+
+        .login-box {
+            background: rgba(30, 20, 10, 0.9);
+            border: 3px solid #8b6914;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(139, 105, 20, 0.3);
         }
+
+        .login-box h1 {
+            color: #f4d03f;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .login-box p {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .character-select {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .character-card {
+            background: rgba(50, 40, 30, 0.8);
+            border: 2px solid #666;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .character-card:hover {
+            border-color: #f4d03f;
+            transform: translateY(-3px);
+        }
+
+        .character-card.selected {
+            border-color: #f4d03f;
+            background: rgba(244, 208, 63, 0.2);
+        }
+
+        .character-card .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .character-card .name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #f4d03f;
+            margin-bottom: 5px;
+        }
+
+        .character-card .desc {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f4d03f;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid #666;
+            border-radius: 5px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #f4d03f;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8b6914 0%, #6b5010 100%);
+            border: 2px solid #f4d03f;
+            border-radius: 5px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #a68217 0%, #8b6914 100%);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            text-align: center;
+            color: #666;
+            margin: 15px 0;
+        }
+
+        /* 游戏主界面 */
+        #gameScreen {
+            display: none;
+            height: 100vh;
+            background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%);
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        /* 顶部标题栏 */
+        .header {
+            grid-column: 1 / -1;
+            background: rgba(20, 15, 10, 0.9);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #f4d03f;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .room-info {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .room-id {
+            color: #f4d03f;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 左侧玩家面板 */
+        .players-panel {
+            background: rgba(20, 15, 10, 0.9);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .players-panel h3 {
+            color: #f4d03f;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid #666;
+            padding-bottom: 8px;
+        }
+
+        .player-card {
+            background: rgba(40, 30, 20, 0.8);
+            border: 2px solid #666;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .player-card.me {
+            border-color: #f4d03f;
+        }
+
+        .player-card.cannot-move {
+            opacity: 0.5;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .player-icon {
+            font-size: 28px;
+        }
+
+        .player-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .hp-bar {
+            background: #333;
+            border-radius: 4px;
+            height: 18px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .hp-fill {
+            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #fff;
+        }
+
+        .status-tag {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-tag.active {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .status-tag.locked {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        /* 中央场景区域 */
+        .scene-panel {
+            background: rgba(20, 15, 10, 0.9);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .scene-description {
+            background: rgba(40, 30, 20, 0.8);
+            border: 2px solid #666;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            color: #ddd;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .areas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .area-card {
+            background: rgba(40, 30, 20, 0.8);
+            border: 2px solid #666;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .area-card:hover {
+            border-color: #f4d03f;
+            transform: scale(1.05);
+        }
+
+        .area-card.hidden {
+            display: none;
+        }
+
+        .area-name {
+            color: #f4d03f;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .area-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        /* 故事日志 */
+        .story-log {
+            flex: 1;
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid #666;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .story-entry {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(40, 30, 20, 0.6);
+            border-left: 3px solid #8b6914;
+            border-radius: 4px;
+            animation: fadeIn 0.5s;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in {
-            animation: fadeIn 0.3s ease-out;
+
+        .story-entry .player-name {
+            color: #f4d03f;
+            font-weight: bold;
         }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+        .story-entry .text {
+            color: #ddd;
+            margin-top: 5px;
+            line-height: 1.5;
         }
-        .shake {
-            animation: shake 0.3s ease-in-out;
+
+        /* 右侧状态面板 */
+        .status-panel {
+            background: rgba(20, 15, 10, 0.9);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+        .status-section {
+            margin-bottom: 20px;
         }
-        .float {
-            animation: float 3s ease-in-out infinite;
+
+        .status-section h3 {
+            color: #f4d03f;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid #666;
+            padding-bottom: 6px;
+        }
+
+        .letters-collected {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .letter-badge {
+            width: 40px;
+            height: 40px;
+            background: #8b6914;
+            border: 2px solid #f4d03f;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(244, 208, 63, 0.3);
+        }
+
+        .inventory-list {
+            list-style: none;
+        }
+
+        .inventory-item {
+            background: rgba(40, 30, 20, 0.8);
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .door-unlock {
+            background: rgba(40, 30, 20, 0.8);
+            border: 2px solid #f4d03f;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .door-unlock input {
+            width: 100%;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 20px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* 底部控制栏 */
+        .controls {
+            grid-column: 1 / -1;
+            background: rgba(20, 15, 10, 0.9);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .keyword-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .keyword-input-group input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .keyword-input-group button {
+            width: auto;
+            margin-bottom: 0;
+            padding: 12px 30px;
+        }
+
+        .hint-text {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+        }
+
+        /* 等待界面 */
+        .waiting-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .waiting-screen h2 {
+            color: #f4d03f;
+            margin-bottom: 20px;
+        }
+
+        .waiting-screen .player-list {
+            margin: 20px 0;
+        }
+
+        .waiting-screen .player-item {
+            background: rgba(40, 30, 20, 0.8);
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 8px auto;
+            max-width: 300px;
+        }
+
+        /* 游戏完成界面 */
+        .victory-banner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 10, 0.95);
+            border: 3px solid #f4d03f;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 50px rgba(244, 208, 63, 0.5);
+        }
+
+        .victory-banner h2 {
+            color: #f4d03f;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .victory-banner .message {
+            color: #ddd;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            white-space: pre-line;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .game-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto auto;
+            }
+
+            .players-panel,
+            .status-panel {
+                max-height: 200px;
+            }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 min-h-screen">
+<body>
     <!-- 登录界面 -->
-    <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full border border-white border-opacity-20">
-            <div class="text-center mb-6">
-                <div class="text-6xl mb-4">⚔️</div>
-                <h1 class="text-4xl font-bold text-white mb-2">三人打BOSS</h1>
-                <p class="text-gray-300">骰子冒险 - 击败黑暗领主</p>
-                <div class="mt-2 inline-flex items-center gap-2 bg-green-500 bg-opacity-20 text-green-300 px-3 py-1 rounded-full text-sm">
-                    <span id="statusDot" class="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                    <span id="statusText">正在连接...</span>
+    <div id="loginScreen">
+        <div class="login-box">
+            <h1>🗝️ 三兄弟的冒险2</h1>
+            <p>第一幕：密室逃脱</p>
+
+            <div class="input-group">
+                <label>选择你的角色</label>
+                <div class="character-select" id="characterSelect">
+                    <div class="character-card" data-character="cat">
+                        <div class="icon">🐱</div>
+                        <div class="name">天一</div>
+                        <div class="desc">灵活敏捷但怕水</div>
+                    </div>
+                    <div class="character-card" data-character="dog">
+                        <div class="icon">🐶</div>
+                        <div class="name">二水</div>
+                        <div class="desc">力量强大且忠诚</div>
+                    </div>
+                    <div class="character-card" data-character="turtle">
+                        <div class="icon">🐢</div>
+                        <div class="name">包子</div>
+                        <div class="desc">防御高擅长游泳</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="mb-6">
-                <label class="block text-gray-300 font-semibold mb-2">勇士名字</label>
-                <input
-                    type="text"
-                    id="playerName"
-                    placeholder="输入你的名字"
-                    maxlength="15"
-                    class="w-full px-4 py-3 bg-white bg-opacity-20 border-2 border-white border-opacity-30 rounded-xl focus:border-purple-400 focus:outline-none text-lg text-white placeholder-gray-400"
-                />
+            <div class="input-group">
+                <label>输入你的名字</label>
+                <input type="text" id="playerName" placeholder="请输入名字" maxlength="10">
             </div>
 
-            <div class="space-y-3 mb-6">
-                <button
-                    id="createRoomBtn"
-                    onclick="createRoom()"
-                    disabled
-                    class="w-full bg-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:bg-purple-700 transition-all shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    🗡️ 创建房间
-                </button>
+            <button id="createRoomBtn" onclick="createRoom()">创建房间</button>
 
-                <div class="flex items-center gap-2">
-                    <div class="flex-1 h-px bg-white bg-opacity-30"></div>
-                    <span class="text-gray-400 text-sm">或</span>
-                    <div class="flex-1 h-px bg-white bg-opacity-30"></div>
-                </div>
+            <div class="divider">─ 或者 ─</div>
 
-                <input
-                    type="text"
-                    id="roomIdInput"
-                    placeholder="输入房间ID"
-                    maxlength="6"
-                    class="w-full px-4 py-3 bg-white bg-opacity-20 border-2 border-white border-opacity-30 rounded-xl focus:border-purple-400 focus:outline-none text-lg text-center font-mono uppercase text-white placeholder-gray-400"
-                />
-
-                <button
-                    id="joinRoomBtn"
-                    onclick="joinRoom()"
-                    disabled
-                    class="w-full bg-green-600 text-white font-bold py-4 px-6 rounded-xl hover:bg-green-700 transition-all shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    🛡️ 加入房间
-                </button>
+            <div class="input-group">
+                <label>加入已有房间</label>
+                <input type="text" id="roomIdInput" placeholder="输入房间ID" maxlength="6" style="text-transform: uppercase;">
             </div>
 
-            <div class="bg-purple-500 bg-opacity-20 rounded-xl p-4 text-sm text-gray-300">
-                <p class="font-semibold mb-2 text-white">⚔️ 游戏说明：</p>
-                <ul class="space-y-1 text-xs">
-                    <li>✅ 3人组队挑战强大的BOSS</li>
-                    <li>✅ 通过摇骰子决定攻击伤害（1-6点）</li>
-                    <li>✅ BOSS会随机反击玩家</li>
-                    <li>✅ 击败BOSS或全员阵亡则游戏结束</li>
-                    <li>✅ 真正的在线联机，支持跨设备</li>
-                </ul>
-            </div>
+            <button id="joinRoomBtn" onclick="joinRoom()">加入房间</button>
         </div>
     </div>
 
     <!-- 游戏界面 -->
-    <div id="gameScreen" class="hidden p-4 md:p-8 min-h-screen">
-        <div class="max-w-7xl mx-auto">
-            <!-- 头部信息 -->
-            <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-4 mb-6 border border-white border-opacity-20">
-                <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <h1 class="text-3xl font-bold text-white flex items-center gap-2">
-                            ⚔️ 骰子冒险
-                        </h1>
-                        <p class="text-gray-300 text-sm opacity-90 flex items-center gap-2">
-                            <span id="connectionStatus" class="inline-flex items-center gap-1">
-                                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                已连接
-                            </span>
-                            <span>•</span>
-                            <span id="playerCount">👥 0/3 位勇士</span>
-                        </p>
-                    </div>
-
-                    <div id="roomIdDisplay" class="bg-white bg-opacity-10 rounded-xl px-4 py-2 shadow-lg border border-white border-opacity-20">
-                        <p class="text-xs text-gray-300 mb-1">房间ID（分享给队友）</p>
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl font-bold text-purple-300 font-mono" id="roomIdText"></span>
-                            <button
-                                onclick="copyRoomId()"
-                                id="copyButton"
-                                class="p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition-colors"
-                                title="复制房间ID"
-                            >
-                                📋
-                            </button>
-                        </div>
-                    </div>
+    <div id="gameScreen">
+        <div class="game-container">
+            <!-- 顶部标题栏 -->
+            <div class="header">
+                <h1>🗝️ 密室逃脱</h1>
+                <div class="room-info">
+                    房间ID: <span class="room-id" id="roomIdDisplay" onclick="copyRoomId()">------</span>
+                    <span id="playerCountDisplay"></span>
                 </div>
             </div>
 
-            <!-- 角色选择区域 -->
-            <div id="characterSelectContainer" class="mb-6 bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-6 border border-white border-opacity-20 hidden">
-                <h2 class="text-2xl font-bold text-white mb-4 text-center">⚔️ 选择你的角色</h2>
-                <div id="characterGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <!-- 角色卡片将动态添加 -->
+            <!-- 左侧玩家面板 -->
+            <div class="players-panel">
+                <h3>👥 冒险者</h3>
+                <div id="playersContainer"></div>
+            </div>
+
+            <!-- 中央场景区域 -->
+            <div class="scene-panel">
+                <!-- 等待开始界面 -->
+                <div id="waitingScreen" class="waiting-screen">
+                    <h2>⏳ 等待所有玩家就位</h2>
+                    <p>需要3名玩家才能开始冒险</p>
+                    <div class="player-list" id="waitingPlayerList"></div>
+                    <button id="startGameBtn" onclick="startGame()" style="max-width: 300px; margin: 20px auto; display: none;">开始游戏</button>
                 </div>
-                <p class="text-gray-300 text-sm text-center" id="characterSelectHint">请选择一个角色</p>
+
+                <!-- 游戏场景界面 -->
+                <div id="gameSceneScreen" style="display: none; flex-direction: column; height: 100%;">
+                    <div class="scene-description" id="sceneDescription"></div>
+                    <div class="areas-grid" id="areasGrid"></div>
+                    <div class="story-log" id="storyLog"></div>
+                </div>
             </div>
 
-            <!-- 开始游戏按钮 -->
-            <div id="startGameContainer" class="mb-6 text-center hidden">
-                <button
-                    onclick="startGame()"
-                    class="bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-xl hover:bg-yellow-400 transition-all shadow-2xl text-lg pulse-animation"
-                >
-                    🎮 开始游戏
-                </button>
-                <p class="text-gray-300 text-sm mt-2" id="startGameHint">等待所有玩家选择角色...</p>
-            </div>
-
-            <!-- BOSS区域 -->
-            <div id="bossArea" class="mb-8">
-                <div class="bg-gradient-to-br from-red-900 to-purple-900 rounded-3xl p-6 shadow-2xl border-4 border-red-600 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-full opacity-10 float">
-                        <div class="text-9xl text-center mt-8">👹</div>
-                    </div>
-
-                    <div class="relative z-10">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-3xl font-bold text-white flex items-center gap-2">
-                                <span id="bossName">黑暗领主</span>
-                                <span id="bossStatus" class="text-sm"></span>
-                            </h2>
-                            <div class="text-6xl" id="bossEmoji">👹</div>
-                        </div>
-
-                        <!-- BOSS血条 -->
-                        <div class="mb-3">
-                            <div class="flex justify-between text-sm text-white mb-1">
-                                <span>HP</span>
-                                <span id="bossHpText">100/100</span>
-                            </div>
-                            <div class="w-full bg-gray-800 rounded-full h-6 overflow-hidden border-2 border-gray-700">
-                                <div
-                                    id="bossHpBar"
-                                    class="bg-gradient-to-r from-red-500 to-orange-500 h-full transition-all duration-500 flex items-center justify-center text-white text-xs font-bold"
-                                    style="width: 100%"
-                                >
-                                    100%
-                                </div>
-                            </div>
-                        </div>
+            <!-- 右侧状态面板 -->
+            <div class="status-panel">
+                <div class="status-section">
+                    <h3>📝 已收集字母</h3>
+                    <div class="letters-collected" id="lettersCollected">
+                        <span style="color: #666; font-size: 12px;">暂无</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- 胜利/失败提示 -->
-            <div id="victoryBanner" class="hidden bg-yellow-400 text-gray-900 rounded-2xl p-6 mb-6 text-center shadow-2xl pulse-animation">
-                <span class="text-3xl font-bold">🏆 胜利！你们击败了BOSS！🎉</span>
-            </div>
+                <div class="status-section">
+                    <h3>🎒 背包</h3>
+                    <ul class="inventory-list" id="inventoryList">
+                        <li style="color: #666; font-size: 12px;">空空如也</li>
+                    </ul>
+                </div>
 
-            <div id="defeatBanner" class="hidden bg-red-600 text-white rounded-2xl p-6 mb-6 text-center shadow-2xl">
-                <span class="text-3xl font-bold">💀 全军覆没！BOSS获胜！</span>
-            </div>
-
-            <!-- 战斗日志 -->
-            <div id="battleLogContainer" class="mb-6 bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-4 border border-white border-opacity-20 max-h-32 overflow-y-auto hidden">
-                <h3 class="text-white font-bold mb-2">⚔️ 战斗日志</h3>
-                <div id="battleLog" class="space-y-1 text-sm text-gray-300">
+                <div class="status-section door-unlock" id="doorUnlockSection" style="display: none;">
+                    <h3>🚪 大门密码</h3>
+                    <p style="font-size: 12px; color: #aaa; margin: 10px 0;">输入4个字母</p>
+                    <input type="text" id="doorPassword" placeholder="ECHO" maxlength="4" style="margin-bottom: 10px;">
+                    <button onclick="tryOpenDoor()">🔓 尝试开门</button>
                 </div>
             </div>
 
-            <!-- 玩家列表 -->
-            <div class="mb-6">
-                <h3 class="text-white font-bold text-xl mb-3">👥 勇士队伍</h3>
-                <div id="playersGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- 玩家卡片将动态添加 -->
-                </div>
-            </div>
-
-            <!-- 控制按钮 -->
-            <div class="text-center space-y-3">
-                <button
-                    onclick="resetGame()"
-                    class="bg-white bg-opacity-20 text-white font-bold py-3 px-6 rounded-xl hover:bg-opacity-30 transition-all shadow-2xl inline-flex items-center gap-2 border border-white border-opacity-30"
-                >
-                    🔄 重新开始游戏
-                </button>
-                <div>
-                    <button
-                        onclick="leaveRoom()"
-                        class="text-gray-300 text-sm underline hover:no-underline"
+            <!-- 底部控制栏 -->
+            <div class="controls" id="controlsPanel" style="display: none;">
+                <div class="keyword-input-group">
+                    <input
+                        type="text"
+                        id="keywordInput"
+                        placeholder="输入关键词，如：水潭+龟 或 行李箱+猫"
+                        onkeypress="handleKeywordEnter(event)"
                     >
-                        退出房间
-                    </button>
+                    <button onclick="submitKeyword()">🔍 执行</button>
+                </div>
+                <div class="hint-text">
+                    💡 提示：尝试组合场景中的物品和角色名字，格式如"物品+角色"
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        let socket;
-        let myId = '';
-        let myName = '';
-        let roomId = '';
-        let players = {};
-        let boss = null;
-        let gameStarted = false;
-        let gameOver = false;
-        let characters = {};
-
-        const colors = [
-            'bg-blue-600',
-            'bg-green-600',
-            'bg-purple-600'
-        ];
-
-        // 连接到服务器
-        function initSocket() {
-            socket = io();
-
-            socket.on('connect', () => {
-                console.log('已连接到服务器');
-                updateConnectionStatus(true);
-            });
-
-            socket.on('disconnect', () => {
-                console.log('与服务器断开连接');
-                updateConnectionStatus(false);
-            });
-
-            socket.on('roomCreated', (data) => {
-                roomId = data.roomId;
-                players = data.players;
-                boss = data.boss;
-                gameStarted = data.gameStarted;
-                characters = data.characters;
-                showGameScreen();
-            });
-
-            socket.on('playerJoined', (data) => {
-                players = data.players;
-                boss = data.boss;
-                gameStarted = data.gameStarted;
-                if (data.characters) characters = data.characters;
-                updateUI();
-            });
-
-            socket.on('characterSelected', (data) => {
-                players = data.players;
-                updateUI();
-                if (data.playerId === myId) {
-                    showNotification(`你选择了 ${data.character.name} ${data.character.icon}`);
-                }
-            });
-
-            socket.on('gameStarted', (data) => {
-                players = data.players;
-                boss = data.boss;
-                gameStarted = true;
-                updateUI();
-                showNotification('游戏开始！开始攻击BOSS吧！');
-            });
-
-            socket.on('playerRolling', (data) => {
-                if (players[data.playerId]) {
-                    players[data.playerId].rolling = true;
-                    updateUI();
-                }
-            });
-
-            socket.on('diceResult', (data) => {
-                players = data.players;
-                boss = data.boss;
-
-                if (data.battleLog) {
-                    displayBattleLog(data.battleLog);
-                }
-
-                if (data.gameOver) {
-                    gameOver = true;
-                    if (data.winner === 'players') {
-                        document.getElementById('victoryBanner').classList.remove('hidden');
-                        document.getElementById('bossEmoji').textContent = '💀';
-                    } else {
-                        document.getElementById('defeatBanner').classList.remove('hidden');
-                    }
-                }
-
-                updateUI();
-            });
-
-            socket.on('gameReset', (data) => {
-                players = data.players;
-                boss = data.boss;
-                gameOver = false;
-                document.getElementById('victoryBanner').classList.add('hidden');
-                document.getElementById('defeatBanner').classList.add('hidden');
-                document.getElementById('bossEmoji').textContent = '👹';
-                document.getElementById('battleLog').innerHTML = '';
-                document.getElementById('battleLogContainer').classList.add('hidden');
-                updateUI();
-            });
-
-            socket.on('playerLeft', (data) => {
-                players = data.players;
-                showNotification(`${data.playerName} 离开了房间`);
-                updateUI();
-            });
-
-            socket.on('error', (data) => {
-                alert(data.message);
-            });
-        }
-
-        function updateConnectionStatus(connected) {
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            const createBtn = document.getElementById('createRoomBtn');
-            const joinBtn = document.getElementById('joinRoomBtn');
-
-            if (connected) {
-                statusDot.className = 'w-2 h-2 bg-green-500 rounded-full animate-pulse';
-                statusText.textContent = '已连接';
-                createBtn.disabled = false;
-                joinBtn.disabled = false;
-            } else {
-                statusDot.className = 'w-2 h-2 bg-red-500 rounded-full';
-                statusText.textContent = '连接断开';
-                createBtn.disabled = true;
-                joinBtn.disabled = true;
-            }
-        }
-
-        function generateRoomId() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
-
-        function generatePlayerId() {
-            return 'p' + Date.now() + Math.random().toString(36).substring(2, 7);
-        }
-
-        function createRoom() {
-            const nameInput = document.getElementById('playerName');
-            if (!nameInput.value.trim()) {
-                alert('请输入你的名字！');
-                return;
-            }
-
-            myName = nameInput.value.trim();
-            myId = generatePlayerId();
-            const newRoomId = generateRoomId();
-
-            socket.emit('createRoom', {
-                roomId: newRoomId,
-                playerName: myName,
-                playerId: myId
-            });
-        }
-
-        function joinRoom() {
-            const nameInput = document.getElementById('playerName');
-            const roomInput = document.getElementById('roomIdInput');
-
-            if (!nameInput.value.trim() || !roomInput.value.trim()) {
-                alert('请输入你的名字和房间ID！');
-                return;
-            }
-
-            myName = nameInput.value.trim();
-            myId = generatePlayerId();
-            roomId = roomInput.value.trim().toUpperCase();
-
-            socket.emit('joinRoom', {
-                roomId: roomId,
-                playerName: myName,
-                playerId: myId
-            });
-
-            // 延迟显示游戏界面，等待服务器响应
-            setTimeout(() => {
-                if (Object.keys(players).length > 0) {
-                    showGameScreen();
-                }
-            }, 500);
-        }
-
-        function startGame() {
-            socket.emit('startGame', { roomId });
-        }
-
-        function showGameScreen() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            document.getElementById('roomIdText').textContent = roomId;
-            renderCharacterSelection();
-            updateUI();
-        }
-
-        function selectCharacter(characterId) {
-            if (gameStarted) {
-                alert('游戏已开始，无法更改角色！');
-                return;
-            }
-
-            socket.emit('selectCharacter', {
-                roomId: roomId,
-                playerId: myId,
-                characterId: characterId
-            });
-        }
-
-        function renderCharacterSelection() {
-            const grid = document.getElementById('characterGrid');
-            grid.innerHTML = '';
-
-            Object.values(characters).forEach(char => {
-                const card = document.createElement('div');
-                card.className = 'bg-white bg-opacity-10 rounded-xl p-4 cursor-pointer hover:bg-opacity-20 transition-all border-2 border-white border-opacity-20 hover:border-opacity-50';
-                card.onclick = () => selectCharacter(char.id);
-
-                card.innerHTML = `
-                    <div class="text-center">
-                        <div class="text-5xl mb-2">${char.icon}</div>
-                        <h3 class="text-xl font-bold text-white mb-2">${char.name}</h3>
-                        <div class="text-sm text-gray-300 mb-2">
-                            <span class="bg-red-500 bg-opacity-30 px-2 py-1 rounded">HP: ${char.maxHp}</span>
-                        </div>
-                        <p class="text-xs text-gray-400">${char.description}</p>
-                    </div>
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        function updateUI() {
-            const playersList = Object.values(players);
-            document.getElementById('playerCount').textContent = `👥 ${playersList.length}/3 位勇士`;
-
-            // 检查所有玩家是否都选择了角色
-            const allSelected = playersList.every(p => p.character !== null);
-            const myPlayer = players[myId];
-
-            // 显示/隐藏角色选择区域
-            const characterSelectContainer = document.getElementById('characterSelectContainer');
-            if (!gameStarted && myPlayer && !myPlayer.character) {
-                characterSelectContainer.classList.remove('hidden');
-            } else {
-                characterSelectContainer.classList.add('hidden');
-            }
-
-            // 显示开始游戏按钮（房主且未开始游戏且所有人都选了角色）
-            const startGameContainer = document.getElementById('startGameContainer');
-            const startGameHint = document.getElementById('startGameHint');
-            if (!gameStarted && playersList.length > 0 && playersList[0].id === myId) {
-                startGameContainer.classList.remove('hidden');
-                if (allSelected) {
-                    startGameHint.textContent = '所有玩家已准备！点击开始游戏';
-                } else {
-                    startGameHint.textContent = '等待所有玩家选择角色...';
-                }
-            } else {
-                startGameContainer.classList.add('hidden');
-            }
-
-            // 更新BOSS信息
-            if (boss) {
-                updateBossUI();
-            }
-
-            // 更新玩家列表
-            const grid = document.getElementById('playersGrid');
-            grid.innerHTML = '';
-
-            // 我的卡片排在第一位
-            playersList.sort((a, b) => {
-                if (a.id === myId) return -1;
-                if (b.id === myId) return 1;
-                return 0;
-            });
-
-            playersList.forEach((player, index) => {
-                const isMe = player.id === myId;
-                const color = colors[index % colors.length];
-                const card = document.createElement('div');
-                const hpPercent = player.maxHp > 0 ? (player.hp / player.maxHp) * 100 : 0;
-
-                card.className = `${color} rounded-2xl p-4 shadow-2xl transform transition-all fade-in ${isMe ? 'ring-4 ring-yellow-400' : ''} ${player.isDead ? 'opacity-50 grayscale' : ''}`;
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-xl font-bold text-white truncate flex items-center gap-2">
-                            ${player.character ? player.character.icon : '❓'}
-                            ${escapeHtml(player.name)}
-                            ${player.isDead ? '💀' : ''}
-                        </h2>
-                        ${isMe ? '<span class="bg-yellow-400 text-gray-900 px-2 py-1 rounded-full text-xs font-bold">你</span>' : ''}
-                    </div>
-
-                    ${player.character ? `
-                        <div class="mb-2 text-center">
-                            <span class="bg-white bg-opacity-20 px-2 py-1 rounded text-xs text-white">${player.character.name}</span>
-                        </div>
-                    ` : `
-                        <div class="mb-2 text-center">
-                            <span class="bg-yellow-500 bg-opacity-30 px-2 py-1 rounded text-xs text-yellow-200">未选择角色</span>
-                        </div>
-                    `}
-
-                    <!-- 玩家血条 -->
-                    <div class="mb-3">
-                        <div class="flex justify-between text-xs text-white mb-1">
-                            <span>HP</span>
-                            <span>${player.hp}/${player.maxHp}</span>
-                        </div>
-                        <div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
-                            <div
-                                class="bg-gradient-to-r from-green-400 to-green-600 h-full transition-all duration-500"
-                                style="width: ${hpPercent}%"
-                            ></div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center mb-4">
-                        ${player.dice === null
-                            ? '<div class="w-20 h-20 bg-white bg-opacity-30 rounded-xl flex items-center justify-center text-4xl">🎲</div>'
-                            : `<div class="${player.rolling ? 'spinning' : ''}">${renderDice(player.dice)}</div>`
-                        }
-                    </div>
-
-                    ${player.dice !== null ? `<div class="text-center mb-3"><span class="text-2xl font-bold text-white">伤害: ${player.damage}</span></div>` : ''}
-
-                    ${isMe && gameStarted && !player.isDead && !gameOver ? `
-                        <button
-                            onclick="rollDice()"
-                            ${player.rolling ? 'disabled' : ''}
-                            class="w-full bg-white text-gray-900 font-bold py-2 px-4 rounded-xl hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
-                        >
-                            ${player.rolling ? '摇骰中...' : '⚔️ 攻击BOSS'}
-                        </button>
-                    ` : ''}
-                    ${!gameStarted ? '<div class="text-center text-white text-sm">等待游戏开始...</div>' : ''}
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        function updateBossUI() {
-            const hpPercent = (boss.hp / boss.maxHp) * 100;
-            document.getElementById('bossName').textContent = boss.name;
-            document.getElementById('bossHpText').textContent = `${boss.hp}/${boss.maxHp}`;
-            document.getElementById('bossHpBar').style.width = hpPercent + '%';
-            document.getElementById('bossHpBar').textContent = Math.round(hpPercent) + '%';
-
-            const bossArea = document.querySelector('#bossArea > div');
-            if (boss.hp < boss.maxHp * 0.3) {
-                bossArea.classList.add('shake');
-                setTimeout(() => bossArea.classList.remove('shake'), 300);
-            }
-        }
-
-        function displayBattleLog(logs) {
-            const logContainer = document.getElementById('battleLog');
-            const logContainerWrapper = document.getElementById('battleLogContainer');
-            logContainerWrapper.classList.remove('hidden');
-
-            logs.forEach(log => {
-                const logEntry = document.createElement('div');
-                logEntry.className = 'fade-in';
-
-                if (log.type === 'player_attack') {
-                    const criticalText = log.isCritical ? '<span class="text-yellow-300 font-bold">【暴击！】</span>' : '';
-                    const diceInfo = log.diceResult ? ` (骰子: ${log.diceResult})` : '';
-                    logEntry.innerHTML = `⚔️ <span class="text-yellow-300">${escapeHtml(log.playerName)}</span> ${criticalText}对BOSS造成 <span class="text-red-400 font-bold">${log.damage}</span> 点伤害${diceInfo}！BOSS剩余HP: <span class="text-orange-400">${log.bossHp}</span>`;
-                } else if (log.type === 'boss_attack') {
-                    logEntry.innerHTML = `💥 BOSS反击 <span class="text-yellow-300">${escapeHtml(log.targetName)}</span>，造成 <span class="text-red-400">${log.damage}</span> 点伤害！剩余HP: <span class="text-green-400">${log.targetHp}</span>`;
-                } else if (log.type === 'player_died') {
-                    logEntry.innerHTML = `💀 <span class="text-red-400">${escapeHtml(log.playerName)}</span> 阵亡了！`;
-                }
-
-                logContainer.appendChild(logEntry);
-            });
-
-            // 滚动到底部
-            logContainerWrapper.scrollTop = logContainerWrapper.scrollHeight;
-        }
-
-        function renderDice(number) {
-            const dots = {
-                1: [[1, 1]],
-                2: [[0, 0], [2, 2]],
-                3: [[0, 0], [1, 1], [2, 2]],
-                4: [[0, 0], [0, 2], [2, 0], [2, 2]],
-                5: [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]],
-                6: [[0, 0], [0, 2], [1, 0], [1, 2], [2, 0], [2, 2]]
-            };
-
-            let html = '<div class="w-20 h-20 bg-white rounded-xl shadow-lg grid grid-cols-3 gap-1.5 p-2.5 border-4 border-gray-800">';
-
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 3; col++) {
-                    const hasDot = dots[number]?.some(([r, c]) => r === row && c === col);
-                    html += `<div class="rounded-full ${hasDot ? 'bg-gray-800' : 'bg-transparent'}"></div>`;
-                }
-            }
-
-            html += '</div>';
-            return html;
-        }
-
-        function rollDice() {
-            if (!gameStarted || gameOver) {
-                alert('游戏未开始或已结束！');
-                return;
-            }
-
-            socket.emit('rollDice', {
-                roomId: roomId,
-                playerId: myId
-            });
-        }
-
-        function resetGame() {
-            socket.emit('resetGame', {
-                roomId: roomId
-            });
-        }
-
-        function copyRoomId() {
-            navigator.clipboard.writeText(roomId).then(() => {
-                const btn = document.getElementById('copyButton');
-                btn.textContent = '✅';
-                setTimeout(() => {
-                    btn.textContent = '📋';
-                }, 2000);
-            }).catch(() => {
-                prompt('复制这个房间ID分享给朋友:', roomId);
-            });
-        }
-
-        function leaveRoom() {
-            if (confirm('确定要退出房间吗？')) {
-                location.reload();
-            }
-        }
-
-        function showNotification(message) {
-            console.log(message);
-            // 可以在这里添加通知UI
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // 输入框自动转大写
-        const roomInput = document.getElementById('roomIdInput');
-        if (roomInput) {
-            roomInput.addEventListener('input', (e) => {
-                e.target.value = e.target.value.toUpperCase();
-            });
-        }
-
-        // 回车键快捷操作
-        document.getElementById('playerName')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                createRoom();
-            }
-        });
-
-        document.getElementById('roomIdInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                joinRoom();
-            }
-        });
-
-        // 初始化
-        initSocket();
-    </script>
+    <!-- 胜利界面 -->
+    <div id="victoryBanner" style="display: none;" class="victory-banner">
+        <h2>🎉 恭喜通关！</h2>
+        <div class="message" id="victoryMessage"></div>
+        <button onclick="location.reload()">返回大厅</button>
+    </div>
+
+    <script src="game.js"></script>
 </body>
 </html>
