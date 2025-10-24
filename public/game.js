@@ -125,6 +125,22 @@ function initSocket() {
 
     socket.on('error', (data) => {
         alert(data.message);
+
+        // 如果是未登录错误，跳转到登录页
+        if (data.message.includes('未登录') || data.message.includes('请先登录')) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('username');
+            window.location.href = '/login.html';
+        }
+    });
+
+    // 认证错误处理
+    socket.on('authError', (data) => {
+        console.error('认证错误:', data.message);
+        alert(data.message);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('username');
+        window.location.href = '/login.html';
     });
 
     // 重连成功
