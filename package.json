@@ -1,12 +1,12 @@
 {
-  "name": "dice-game-server",
-  "version": "1.0.0",
-  "description": "在线摇骰子多人游戏服务器",
+  "name": "dice-boss-game",
+  "version": "2.0.0",
+  "description": "三人在线打BOSS骰子冒险游戏 - 通过摇骰子决定伤害击败BOSS",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["dice", "game", "socket.io", "multiplayer"],
+  "keywords": ["dice", "game", "socket.io", "multiplayer", "boss", "battle"],
   "author": "",
   "license": "MIT",
   "dependencies": {
