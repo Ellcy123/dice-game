@@ -102,6 +102,59 @@
         </div>
     </div>
 
+    <!-- 角色选择界面 -->
+    <div id="characterScreen" class="hidden flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-3xl w-full">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">🎭</div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">选择你的角色</h1>
+                <p class="text-gray-600">从下方三个角色中选择一个</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- 角色 A -->
+                <div
+                    onclick="selectCharacter('A')"
+                    class="character-card cursor-pointer bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all"
+                >
+                    <div class="text-center">
+                        <div class="text-7xl mb-4">⚔️</div>
+                        <h2 class="text-3xl font-bold text-white mb-2">角色 A</h2>
+                        <p class="text-blue-100 text-sm">勇敢的战士</p>
+                    </div>
+                </div>
+
+                <!-- 角色 B -->
+                <div
+                    onclick="selectCharacter('B')"
+                    class="character-card cursor-pointer bg-gradient-to-br from-green-400 to-green-600 rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all"
+                >
+                    <div class="text-center">
+                        <div class="text-7xl mb-4">🏹</div>
+                        <h2 class="text-3xl font-bold text-white mb-2">角色 B</h2>
+                        <p class="text-green-100 text-sm">敏捷的猎手</p>
+                    </div>
+                </div>
+
+                <!-- 角色 C -->
+                <div
+                    onclick="selectCharacter('C')"
+                    class="character-card cursor-pointer bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all"
+                >
+                    <div class="text-center">
+                        <div class="text-7xl mb-4">🔮</div>
+                        <h2 class="text-3xl font-bold text-white mb-2">角色 C</h2>
+                        <p class="text-purple-100 text-sm">神秘的法师</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 text-center">
+                <p class="text-gray-700">💡 选择一个角色后即可开始游戏</p>
+            </div>
+        </div>
+    </div>
+
     <!-- 游戏界面 -->
     <div id="gameScreen" class="hidden p-4 md:p-8">
         <div class="max-w-6xl mx-auto">
@@ -178,6 +231,7 @@
         let socket;
         let myId = '';
         let myName = '';
+        let myCharacter = '';
         let roomId = '';
         let players = {};
 
@@ -207,10 +261,15 @@
             socket.on('roomCreated', (data) => {
                 roomId = data.roomId;
                 players = data.players;
-                showGameScreen();
+                showCharacterScreen();
             });
 
             socket.on('playerJoined', (data) => {
+                players = data.players;
+                updateUI();
+            });
+
+            socket.on('characterSelected', (data) => {
                 players = data.players;
                 updateUI();
             });
@@ -307,19 +366,39 @@
                 playerId: myId
             });
 
-            // 延迟显示游戏界面，等待服务器响应
+            // 延迟显示角色选择界面，等待服务器响应
             setTimeout(() => {
                 if (Object.keys(players).length > 0) {
-                    showGameScreen();
+                    showCharacterScreen();
                 }
             }, 500);
         }
 
+        function showCharacterScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('characterScreen').classList.remove('hidden');
+        }
+
         function showGameScreen() {
             document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('characterScreen').classList.add('hidden');
             document.getElementById('gameScreen').classList.remove('hidden');
             document.getElementById('roomIdText').textContent = roomId;
             updateUI();
+        }
+
+        function selectCharacter(character) {
+            myCharacter = character;
+
+            // 通知服务器角色选择
+            socket.emit('selectCharacter', {
+                roomId: roomId,
+                playerId: myId,
+                character: character
+            });
+
+            // 显示游戏界面
+            showGameScreen();
         }
 
         function updateUI() {
@@ -342,11 +421,26 @@
                 const card = document.createElement('div');
                 card.className = `${color} rounded-2xl p-4 shadow-2xl transform transition-all fade-in ${isMe ? 'ring-4 ring-white' : ''}`;
                 
+                const characterEmojis = {
+                    'A': '⚔️',
+                    'B': '🏹',
+                    'C': '🔮'
+                };
+                const characterNames = {
+                    'A': '战士',
+                    'B': '猎手',
+                    'C': '法师'
+                };
+
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-xl font-bold text-white truncate">${escapeHtml(player.name)}</h2>
+                        <div class="flex items-center gap-2">
+                            ${player.character ? `<span class="text-2xl">${characterEmojis[player.character]}</span>` : ''}
+                            <h2 class="text-xl font-bold text-white truncate">${escapeHtml(player.name)}</h2>
+                        </div>
                         ${isMe ? '<span class="bg-white text-gray-900 px-2 py-1 rounded-full text-xs font-bold">你</span>' : ''}
                     </div>
+                    ${player.character ? `<div class="text-white text-sm mb-3 opacity-90">角色: ${characterNames[player.character]}</div>` : ''}
                     
                     <div class="flex justify-center mb-4">
                         ${player.dice === null 

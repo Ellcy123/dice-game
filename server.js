@@ -34,6 +34,7 @@ io.on('connection', (socket) => {
     rooms[roomId].players[playerId] = {
       id: playerId,
       name: playerName,
+      character: null,
       dice: null,
       rolling: false,
       socketId: socket.id
@@ -62,6 +63,7 @@ io.on('connection', (socket) => {
     rooms[roomId].players[playerId] = {
       id: playerId,
       name: playerName,
+      character: null,
       dice: null,
       rolling: false,
       socketId: socket.id
@@ -103,20 +105,37 @@ io.on('connection', (socket) => {
     }
   });
 
+  // 选择角色
+  socket.on('selectCharacter', (data) => {
+    const { roomId, playerId, character } = data;
+
+    if (rooms[roomId] && rooms[roomId].players[playerId]) {
+      rooms[roomId].players[playerId].character = character;
+
+      io.to(roomId).emit('characterSelected', {
+        playerId,
+        character,
+        players: rooms[roomId].players
+      });
+
+      console.log(`玩家 ${playerId} 在房间 ${roomId} 选择了角色 ${character}`);
+    }
+  });
+
   // 重置游戏
   socket.on('resetGame', (data) => {
     const { roomId } = data;
-    
+
     if (rooms[roomId]) {
       Object.keys(rooms[roomId].players).forEach(playerId => {
         rooms[roomId].players[playerId].dice = null;
         rooms[roomId].players[playerId].rolling = false;
       });
-      
-      io.to(roomId).emit('gameReset', { 
-        players: rooms[roomId].players 
+
+      io.to(roomId).emit('gameReset', {
+        players: rooms[roomId].players
       });
-      
+
       console.log(`房间 ${roomId} 游戏已重置`);
     }
   });
