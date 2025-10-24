@@ -11,6 +11,31 @@ const io = require('socket.io')(http, {
 // 存储所有房间的数据
 const rooms = {};
 
+// 角色配置
+const CHARACTERS = {
+  A: {
+    id: 'A',
+    name: '战士',
+    icon: '🛡️',
+    maxHp: 60,
+    description: '高血量防御型角色，适合新手'
+  },
+  B: {
+    id: 'B',
+    name: '法师',
+    icon: '🔮',
+    maxHp: 40,
+    description: '攻击伤害+1，高输出法术大师'
+  },
+  C: {
+    id: 'C',
+    name: '刺客',
+    icon: '🗡️',
+    maxHp: 45,
+    description: '20%几率暴击造成双倍伤害'
+  }
+};
+
 // BOSS配置
 const BOSS_CONFIG = {
   maxHp: 100,
@@ -51,8 +76,9 @@ io.on('connection', (socket) => {
     rooms[roomId].players[playerId] = {
       id: playerId,
       name: playerName,
-      hp: 50,
-      maxHp: 50,
+      character: null, // 未选择角色
+      hp: 0,
+      maxHp: 0,
       dice: null,
       damage: 0,
       rolling: false,
@@ -65,7 +91,8 @@ io.on('connection', (socket) => {
       roomId,
       players: rooms[roomId].players,
       boss: rooms[roomId].boss,
-      gameStarted: rooms[roomId].gameStarted
+      gameStarted: rooms[roomId].gameStarted,
+      characters: CHARACTERS
     });
 
     console.log(`房间 ${roomId} 已创建，玩家: ${playerName}`);
@@ -93,8 +120,9 @@ io.on('connection', (socket) => {
     rooms[roomId].players[playerId] = {
       id: playerId,
       name: playerName,
-      hp: 50,
-      maxHp: 50,
+      character: null, // 未选择角色
+      hp: 0,
+      maxHp: 0,
       dice: null,
       damage: 0,
       rolling: false,
@@ -108,10 +136,47 @@ io.on('connection', (socket) => {
     io.to(roomId).emit('playerJoined', {
       players: rooms[roomId].players,
       boss: rooms[roomId].boss,
-      gameStarted: rooms[roomId].gameStarted
+      gameStarted: rooms[roomId].gameStarted,
+      characters: CHARACTERS
     });
 
     console.log(`玩家 ${playerName} 加入房间 ${roomId}`);
+  });
+
+  // 选择角色
+  socket.on('selectCharacter', (data) => {
+    const { roomId, playerId, characterId } = data;
+
+    if (!rooms[roomId] || !rooms[roomId].players[playerId]) {
+      socket.emit('error', { message: '房间或玩家不存在' });
+      return;
+    }
+
+    if (!CHARACTERS[characterId]) {
+      socket.emit('error', { message: '角色不存在' });
+      return;
+    }
+
+    if (rooms[roomId].gameStarted) {
+      socket.emit('error', { message: '游戏已开始，无法更改角色' });
+      return;
+    }
+
+    const player = rooms[roomId].players[playerId];
+    const character = CHARACTERS[characterId];
+
+    player.character = character;
+    player.hp = character.maxHp;
+    player.maxHp = character.maxHp;
+
+    // 通知房间内所有人
+    io.to(roomId).emit('characterSelected', {
+      playerId,
+      character,
+      players: rooms[roomId].players
+    });
+
+    console.log(`玩家 ${player.name} 选择了角色 ${character.name}`);
   });
 
   // 开始游戏
@@ -119,6 +184,13 @@ io.on('connection', (socket) => {
     const { roomId } = data;
 
     if (rooms[roomId]) {
+      // 检查所有玩家是否都选择了角色
+      const allSelected = Object.values(rooms[roomId].players).every(p => p.character !== null);
+      if (!allSelected) {
+        socket.emit('error', { message: '所有玩家必须先选择角色！' });
+        return;
+      }
+
       rooms[roomId].gameStarted = true;
       io.to(roomId).emit('gameStarted', {
         players: rooms[roomId].players,
@@ -152,16 +224,37 @@ io.on('connection', (socket) => {
     setTimeout(() => {
       const diceResult = Math.floor(Math.random() * 6) + 1;
       player.dice = diceResult;
-      player.damage = diceResult;
+
+      // 根据角色计算伤害
+      let damage = diceResult;
+      let isCritical = false;
+
+      if (player.character) {
+        // 法师：攻击伤害+1
+        if (player.character.id === 'B') {
+          damage += 1;
+        }
+        // 刺客：20%几率暴击（双倍伤害）
+        else if (player.character.id === 'C') {
+          if (Math.random() < 0.2) {
+            damage *= 2;
+            isCritical = true;
+          }
+        }
+      }
+
+      player.damage = damage;
       player.rolling = false;
 
       // 玩家对BOSS造成伤害
-      room.boss.hp = Math.max(0, room.boss.hp - diceResult);
+      room.boss.hp = Math.max(0, room.boss.hp - damage);
 
       const battleLog = [{
         type: 'player_attack',
         playerName: player.name,
-        damage: diceResult,
+        damage: damage,
+        diceResult: diceResult,
+        isCritical: isCritical,
         bossHp: room.boss.hp
       }];
 
@@ -251,13 +344,14 @@ io.on('connection', (socket) => {
     const { roomId } = data;
 
     if (rooms[roomId]) {
-      // 重置所有玩家状态
+      // 重置所有玩家状态（保留角色选择）
       Object.keys(rooms[roomId].players).forEach(playerId => {
-        rooms[roomId].players[playerId].hp = 50;
-        rooms[roomId].players[playerId].dice = null;
-        rooms[roomId].players[playerId].damage = 0;
-        rooms[roomId].players[playerId].rolling = false;
-        rooms[roomId].players[playerId].isDead = false;
+        const player = rooms[roomId].players[playerId];
+        player.hp = player.character ? player.character.maxHp : 0;
+        player.dice = null;
+        player.damage = 0;
+        player.rolling = false;
+        player.isDead = false;
       });
 
       // 重置BOSS
