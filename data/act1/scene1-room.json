@@ -343,7 +343,7 @@
       "effect": {
         "type": "unlock",
         "target": "cat",
-        "storyText": "行李箱带三位初始密码(000,玩家无法获取),主持人解锁后可救出{cat},{cat}恢复行动",
+        "storyText": "发现一个行李箱，上面有三位密码",
         "unlockCharacter": "cat"
       }
     },
