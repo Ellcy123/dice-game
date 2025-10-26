@@ -106,10 +106,16 @@ function initSocket() {
 
     // 监听行李箱解锁请求
     socket.on('requestSuitcasePassword', (data) => {
+        // 更新游戏状态（包括 suitcaseTriggered 标志）
+        if (data.gameState) {
+            gameState = data.gameState;
+        }
         // 显示密码输入弹窗
         showSuitcasePasswordModal();
         // 显示提示消息
         addStoryEntry('系统', data.message || '请输入行李箱密码以解锁并救出猫');
+        // 更新UI以显示行李箱按钮
+        updateSuitcaseButton();
     });
 
     // 监听行李箱解锁结果
@@ -495,10 +501,9 @@ function updateInventory() {
 // 更新行李箱按钮显示状态
 function updateSuitcaseButton() {
     const suitcaseButton = document.getElementById('suitcaseButton');
-    const discoveredAreas = gameState.discoveredAreas || [];
 
-    // 当行李箱已被发现（被龟触发过）时显示按钮
-    if (discoveredAreas.includes('suitcase')) {
+    // 只有当"行李箱+龟"互动被触发后才显示按钮
+    if (gameState.suitcaseTriggered) {
         suitcaseButton.style.display = 'block';
     } else {
         suitcaseButton.style.display = 'none';

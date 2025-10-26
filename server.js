@@ -696,9 +696,13 @@ io.on('connection', (socket) => {
 
     // 如果需要密码验证，发送密码请求
     if (result.requiresPassword) {
+      // 标记行李箱已被触发（行李箱+龟互动）
+      room.gameState.suitcaseTriggered = true;
+
       io.to(roomId).emit('requestSuitcasePassword', {
         message: result.storyText,
-        passwordType: result.passwordType
+        passwordType: result.passwordType,
+        gameState: room.gameState
       });
       console.log(`房间 ${roomId} - ${player.name} 触发行李箱解锁，请求密码验证`);
       return;
