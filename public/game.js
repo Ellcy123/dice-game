@@ -599,7 +599,6 @@ function closeSuitcaseModal() {
 // 验证行李箱密码
 function verifySuitcasePassword() {
     const password = document.getElementById('suitcaseModalPassword').value.trim();
-    const correctPassword = '000';
     const errorMsg = document.getElementById('suitcaseErrorMsg');
 
     if (!password) {
@@ -608,20 +607,18 @@ function verifySuitcasePassword() {
         return;
     }
 
-    if (password === correctPassword) {
-        // 密码正确，发送确认事件到服务器
-        socket.emit('confirmSuitcaseUnlock', {
-            roomId: roomId,
-            playerId: myId,
-            password: password
-        });
-        closeSuitcaseModal();
-    } else {
-        // 密码错误
-        errorMsg.textContent = '密码错误！';
+    if (password.length !== 3 || !/^\d+$/.test(password)) {
+        errorMsg.textContent = '密码必须是3位数字';
         errorMsg.style.display = 'block';
-        document.getElementById('suitcaseModalPassword').value = '';
+        return;
     }
+
+    // 发送密码到服务器进行验证（玩家无法提前知道密码是什么）
+    socket.emit('confirmSuitcaseUnlock', {
+        roomId: roomId,
+        playerId: myId,
+        password: password
+    });
 }
 
 // 退出登录
