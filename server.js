@@ -288,14 +288,29 @@ function applyEffect(effect, gameState, players, roomId, io, currentPlayerId = n
       break;
 
     case 'discoverArea':
-      effect.areas.forEach(areaId => {
+      // 支持两种格式：
+      // 1. "areas": ["area1", "area2"] (复数格式)
+      // 2. "newAreaId": "hidden-room" + "unlockItems": ["item1", "item2"] (单数+附加项)
+      const areasToDiscover = effect.areas || (effect.newAreaId ? [effect.newAreaId] : []);
+
+      areasToDiscover.forEach(areaId => {
         if (!gameState.discoveredAreas.includes(areaId)) {
           gameState.discoveredAreas.push(areaId);
         }
       });
+
+      // 如果有 unlockItems，也同时发现这些区域
+      if (effect.unlockItems && Array.isArray(effect.unlockItems)) {
+        effect.unlockItems.forEach(areaId => {
+          if (!gameState.discoveredAreas.includes(areaId)) {
+            gameState.discoveredAreas.push(areaId);
+          }
+        });
+      }
+
       results.changes.push({
         type: 'areas_discovered',
-        areas: effect.areas
+        areas: areasToDiscover
       });
       break;
 
