@@ -695,6 +695,65 @@ io.on('connection', (socket) => {
     }
   });
 
+  // 尝试解锁行李箱
+  socket.on('trySuitcaseUnlock', (data) => {
+    const { roomId, playerId, password } = data;
+
+    if (!rooms[roomId]) {
+      socket.emit('error', { message: '房间不存在' });
+      return;
+    }
+
+    const room = rooms[roomId];
+    const suitcaseArea = sceneData.areas['suitcase'];
+
+    if (!suitcaseArea) {
+      socket.emit('error', { message: '行李箱不存在' });
+      return;
+    }
+
+    // 检查密码是否正确
+    if (password === suitcaseArea.password) {
+      // 标记行李箱为已解锁
+      suitcaseArea.locked = false;
+
+      // 解锁猫角色的行动能力
+      const catPlayer = Object.values(room.players).find(p => p.character.id === 'cat');
+      if (catPlayer) {
+        catPlayer.canMove = true;
+
+        // 更新游戏状态
+        room.gameState.catCanMove = true;
+
+        // 发送成功消息给所有玩家
+        io.to(roomId).emit('suitcaseUnlocked', {
+          success: true,
+          message: `行李箱被成功解锁！${catPlayer.name}（猫）获得了行动能力！`,
+          gameState: room.gameState,
+          players: room.players
+        });
+
+        console.log(`房间 ${roomId} - 行李箱已解锁，猫角色恢复行动`);
+      } else {
+        // 即使没有猫角色也解锁行李箱
+        io.to(roomId).emit('suitcaseUnlocked', {
+          success: true,
+          message: '行李箱被成功解锁！',
+          gameState: room.gameState,
+          players: room.players
+        });
+
+        console.log(`房间 ${roomId} - 行李箱已解锁`);
+      }
+    } else {
+      // 密码错误
+      socket.emit('suitcaseUnlocked', {
+        success: false,
+        message: '密码错误！请重新尝试。'
+      });
+    }
+  });
+
   // 重置游戏
   socket.on('resetGame', (data) => {
     const { roomId } = data;
