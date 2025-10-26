@@ -1,210 +1,290 @@
-# 三兄弟的冒险2 - 游戏设计文档
+# CLAUDE.md
 
-## 基本信息
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-- **游戏名称**：三兄弟的冒险2
-- **游戏类型**：3人协作文字冒险RPG
-- **玩家角色**：
-  - 玩家1：猫咪（天一）
-  - 玩家2：狗狗（二水）
-  - 玩家3：乌龟（包子）
-- **系统主持**：AI自动化（无需真人主持人）
-- **游戏平台**：Web在线（支持PC/移动端）
+## Project Overview
 
-## 核心游戏机制
+**三兄弟的冒险2** (Three Brothers Adventure 2) - A 3-player online cooperative text adventure RPG game where players control three animal characters (Cat, Dog, Turtle) through a story-driven adventure with keyword-based interactions and boss battles.
 
-### 1. 生命值系统
+## Development Commands
 
-- **初始生命值**：每位玩家8点
-- **生命值上限**：可通过道具/技能提升
-- **复活机制**：
-  - 玩家阵亡后，其他玩家可消耗2点生命值复活该玩家
-  - 复活后该玩家生命值为1点
-  - 某些特殊技能可改变复活规则
+### Start the Server
+```bash
+npm start
+# or
+node server.js
+```
+Server runs on port 3000 by default (or PORT from environment variable)
 
-### 2. 关键词交互系统
+### Development Mode (with auto-reload)
+```bash
+node --watch server.js  # Node.js 18+ required
+```
 
-这是游戏的核心玩法机制：
+### Access the Game
+- **Login**: http://localhost:3000/login.html
+- **Game**: http://localhost:3000/index.html (after login)
 
-**关键词形式**：
-- `道具 + 道具`（例：水潭+龟）
-- `玩家名 + 道具`（例：猫+囚笼）
-- `玩家名 + 玩家名`（例：猫+狗）
+### Testing Socket.io Events
+Use Postman or Thunder Client VS Code extension to test Socket.io events. See API_REFERENCE.md for event specifications.
 
-**触发机制**：
-- 玩家回合制，轮到自己时可报一次关键词
-- 与AI主持人对话触发对应的剧情内容
-- 不同关键词解锁不同剧情、道具或效果
+## Architecture
 
-**效果类型**：
-- 生命值变化（±1、±2等）
-- 获得道具/技能
-- 解锁隐藏区域
-- 推进剧情进度
+### Tech Stack
+- **Backend**: Node.js 18.x + Express 4.18+ + Socket.io 4.6+
+- **Frontend**: Vanilla JavaScript (no framework) with Socket.io-client
+- **Data Storage**: In-memory (Map/Array) + JSON files
+- **Deployment Target**: Railway
 
-### 3. 角色职业特性
+### File Structure
 
-每个角色在不同场景有不同效果：
+```
+dice-game/
+├── server.js              # Main server (Express + Socket.io setup)
+├── public/                # Static frontend files
+│   ├── index.html         # Main game interface
+│   ├── login.html         # Login/registration page
+│   └── game.js            # Client-side game logic
+└── data/                  # Game data (JSON)
+    └── act1/
+        └── scene1-room.json  # Scene data for Act 1
+```
 
-**猫咪（天一）**：
-- 对老鼠类敌人天敌克制（伤害+1）
-- 怕水（特定场景减生命值）
-- 灵活性高（某些轻功技能加成）
+### Key Architecture Decisions
 
-**狗狗（二水）**：
-- 力量型角色（某些破坏场景有优势）
-- 忠诚度高（团队增益技能）
-- 对猫类有特殊互动
+1. **Monolithic Structure**: Single server.js file handles all Socket.io events (no separate handlers yet)
+2. **In-Memory Storage**: All game state stored in JavaScript objects:
+   - `rooms` - Active game rooms
+   - `users` - User accounts (username/password)
+   - `sessions` - Token-based authentication (24hr expiry)
+3. **Event-Driven**: Game logic triggered by Socket.io events, not REST endpoints
+4. **No Database**: First version uses memory storage (data lost on restart)
 
-**乌龟（包子）**：
-- 防御型角色（高生命值/防御技能）
-- 水性好（水下探索无惩罚）
-- 速度慢（某些场景有劣势）
+### Core Data Structures
 
-## 游戏剧情结构
+#### Room Object
+```javascript
+{
+  roomId: string,           // 6-character unique ID
+  roomName: string,
+  host: socketId,
+  players: [                // Max 3 players
+    {
+      id: socketId,
+      name: string,
+      character: 'cat'|'dog'|'turtle'|null,
+      hp: number,
+      maxHp: number,
+      inventory: [],
+      skills: [],
+      isReady: boolean
+    }
+  ],
+  gameState: 'waiting'|'character-selection'|'playing'|'finished',
+  currentAct: number,
+  currentScene: number,
+  sceneData: object         // Loaded from JSON
+}
+```
 
-### 第一幕：密室逃脱（2关）
+#### User Object
+```javascript
+{
+  username: {
+    password: string,       // Plain text (TODO: hash in production)
+    currentRoomId: string,
+    currentPlayerId: string,
+    lastActive: timestamp
+  }
+}
+```
 
-**第一关：密室**
-- **场景**：被困的密室，有水潭、行李箱、衣柜等区域
-- **初始状态**：猫、狗无法行动，需龟触发关键词拯救
-- **目标**：通过道具组合收集字母C、H、E、O，输入密码ECHO开门
-- **关键要素**：
-  - 水潭探索（龟潜水获得木盒）
-  - 行李箱密码解锁（拯救猫）
-  - 衣柜后发现小房间（拯救狗）
-  - 字母收集（通过不同道具组合）
+### Socket.io Event Flow
 
-**第二关：藏匿**
-- **场景**：遇到黑色兜帽男，需要藏匿躲避
-- **玩法**：8个藏身区域，主持人进行5次随机攻击
-- **区域**：水潭、衣柜、小房间、囚笼、电脑桌、墙角、花瓶、行李箱
-- **规则**：
-  - 被击中玩家生命值-1
-  - 区域被摧毁需更换
-  - 最多2名玩家可藏同一区域
-  - 一次未被攻击的玩家生命值+3
+**Room Creation/Join**:
+1. Client → `create-room` / `join-room`
+2. Server validates & creates/joins room
+3. Server → `room-created` / `room-joined` (to sender)
+4. Server → `player-joined` (broadcast to room)
 
-### 第二幕：记忆回溯
+**Character Selection**:
+1. Client → `select-character` (cat/dog/turtle)
+2. Server validates uniqueness & updates
+3. Server → `character-selected` (broadcast to room)
 
-**玩法类型**：YES/NO互动问答
+**Gameplay**:
+1. Client → `player-action` (keyword/choice)
+2. Server parses keyword, loads scene data
+3. Server applies effects (HP changes, items, etc.)
+4. Server → `story-update` (broadcast to room)
 
-**三段视角记忆**：
-- 视角1（乌龟/二水）：25岁冬天，自然死亡的记忆
-- 视角2（狗狗/包子）：走丢被狗贩子抓走的记忆
-- 视角3（猫咪/天一）：生病被主人安乐死的记忆
+### Data Loading Pattern
 
-**隐藏任务**：
-- 任务1：找到三因（三人故事的成因）
-- 任务2：找到身份（自身对应的真实身份）
+Game scenes are loaded from JSON files on-demand:
+```javascript
+const sceneData = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'data/act1/scene1-room.json'), 'utf8')
+);
+```
 
-**规则**：
-- 玩家只能提问对应自身视角的问题
-- 非对应视角问题，系统回答"不重要"
-- 通过推理还原完整记忆
+**Important**: Scene data structure defined in DATA_FORMAT.md
 
-### 第三幕：个人剧情线（分别行动）
+### Authentication Flow
 
-三人决定分别提升实力，两年后再会合。
+1. Client sends username/password to `/register` or `/login` (HTTP POST)
+2. Server validates & generates token
+3. Server stores session in `sessions` object
+4. Client stores token in localStorage
+5. Client includes token in Socket.io connection handshake
+6. Server verifies token on connection/events
 
-**每个角色3条分支路线**：
+**Token Expiry**: 24 hours
 
-#### 猫咪线（天一）
-1. **学习功夫**：拜鸿猫为师，学习武术技能
-2. **自主创业**：成为烧烤摊招财猫，商业路线
-3. **身体改造**：变成机器猫（哆啦A梦风格），获得高科技道具
+## Code Standards
 
-#### 狗狗线（包子）
-1. **游历天下**：拜老天师为徒，学习法术
-2. **第三类接触**：到赛博坦星，变形金刚路线
-3. **（预留第三条路线）**
+### Language & Style
+- **JavaScript ES6+** (not TypeScript - to reduce learning curve)
+- **ES6 Modules** for future refactoring (currently using CommonJS in server.js)
+- **中文注释** (Chinese comments for easier understanding)
+- **async/await** for asynchronous operations
 
-#### 乌龟线（包子）
-1. **学习功夫**：成为忍者龟，学习武器技能
-2. **身体改造**：成为水炮龟，科技强化
-3. **自主创业**：成为金龟婿，赘婿逆袭路线
+### Naming Conventions
+- **Files**:
+  - React components: `PascalCase.jsx` (future)
+  - Utils: `camelCase.js`
+  - Data files: `lowercase-with-hyphens.json`
+- **Variables**: `camelCase`
+- **Constants**: `UPPER_SNAKE_CASE`
+- **Functions**: `camelCase` with verb prefix (e.g., `createRoom`, `handlePlayerJoin`)
+- **Booleans**: `is/has/can` prefix (e.g., `isReady`, `hasKey`)
 
-**分支特点**：
-- 每条路线多次选择（3-4次重要抉择）
-- 获得不同等级技能（B/A/S/SS/SSS/SSSS级）
-- 获得专属道具（影响BOSS战）
-- 技能/道具在第四幕发挥作用
+See CODE_STANDARDS.md for complete style guide.
 
-### 第四幕：BOSS战（终章）
+## Important Constraints
 
-三人重聚，挑战三位BOSS。
+### Game Rules
+- **Exactly 3 players** per room (no more, no less)
+- **Unique characters**: Each player must choose different character (cat/dog/turtle)
+- **Initial HP**: 8 for all players
+- **Character-specific mechanics**: Different characters have different effects in certain scenes (e.g., cat deals +1 damage to rats)
 
-**第一关：鼠鼠大王**
-- **类型**：个人出战（死亡后换人）
-- **机制**：5个老鼠洞选择，随机分配BOSS/陷阱/道具
-- **特殊规则**：
-  - 猫参战：伤害+1（天敌克制）
-  - 狗参战：不允许登场
-  - 龟参战：伤害减半（师傅压制）
+### Technical Constraints
+- **No persistent database** in v1.0 (memory only)
+- **No user authentication validation** (basic username/password check only)
+- **Single server instance** (no distributed sessions)
+- **No TypeScript** (to keep complexity low)
 
-**第二关：百变小鹦**
-- **类型**：团体出战（考验默契）
-- **机制**：多道选择题，玩家独立答题
-- **规则**：
-  - 选择相同：小鹦生命值-1
-  - 选择不同：全体玩家生命值-1
-  - 禁止场外讨论
+## Key Game Mechanics
 
-**第三关：死神**
-- **类型**：团体赌局
-- **机制**：15轮骰子赌博，需赚取1000+生命值
-- **规则**：
-  - 玩家生命值总和作为筹码
-  - 每轮选择下注金额和方向
-  - 不同轮次不同赔率（2倍~20倍）
-  - 超过15回合或生命值归0则失败
+### Keyword System
+Players interact by submitting keywords in format:
+- `item + item` (e.g., "水潭+龟")
+- `player + item` (e.g., "猫+囚笼")
+- `player + player` (e.g., "猫+狗")
 
-## 多结局系统
+Server parses keywords and triggers corresponding scene effects from JSON data.
 
-**结局0**：死于鼠鼠大王（Game Over）
+### Turn-Based Flow
+1. Players take turns submitting actions
+2. Server validates action against current scene data
+3. Server applies effects (HP changes, inventory updates, story progression)
+4. Server broadcasts updated game state to all players
+5. Repeat until scene objective met
 
-**结局1**：疯人院结局
-- 触发条件：击败鼠鼠大王，但未挑战后续BOSS
-- 剧情：原来一切都是精神病院的妄想
-- 双视角叙事：玩家视角 vs 护士视角
+### Boss Battle System
+Three boss battles with different mechanics:
+- **Rat King**: Individual turn-based combat with hole selection
+- **Parrot**: Team synchronization quiz
+- **Reaper**: Dice gambling game
 
-**结局2**：我也永远爱你（真结局）
-- 触发条件：挑战死神（无论胜负）
-- 剧情揭秘：这是宠物死后的回响世界
-- 感人结局：三只宠物给主人留下最后的话
+Each boss has unique rules defined in data/act4/ JSON files.
 
-## 游戏数据来源
+## Development Workflow
 
-所有剧情、道具、技能、战斗数据均来自：
-**《三兄弟的冒险》2.docx**（已上传至Claude Project）
+### Adding New Scene Data
+1. Create JSON file in appropriate `data/actX/` directory
+2. Follow DATA_FORMAT.md structure
+3. Reference scene in server.js scene loading logic
+4. Test keyword interactions in game
 
-## 设计理念
+### Adding Socket.io Events
+1. Define event in server.js `io.on('connection')` block
+2. Implement validation logic
+3. Update room/player state
+4. Broadcast appropriate events to clients
+5. Document in API_REFERENCE.md
+6. Update client-side handler in public/game.js
 
-1. **情感共鸣**：以宠物视角讲述生死离别的故事
-2. **协作机制**：强调3人团队配合而非竞争
-3. **高自由度**：多分支剧情，每次游戏体验不同
-4. **易上手**：文字冒险，无复杂操作
-5. **深度策略**：技能道具搭配、BOSS战策略选择
+### Common Development Tasks
 
-## 技术实现要求
+**Adding a new keyword interaction**:
+1. Edit scene JSON file in `data/`
+2. Add keyword to `keywords` array with effects
+3. No server code change needed (data-driven)
 
-- **3人实时在线**：房间系统，等待3人齐聚
-- **系统自动主持**：AI解析关键词，推进剧情
-- **状态同步**：所有玩家看到相同剧情文本
-- **断线处理**：支持重连（可选功能）
-- **移动端适配**：响应式设计
+**Adding a new game state**:
+1. Add state to `gameState` enum in room object
+2. Update state transition logic in server.js
+3. Add client-side UI handling in game.js
 
-## 目标玩家群体
+**Debugging connection issues**:
+- Check browser console for Socket.io errors
+- Check server logs for connection/disconnection events
+- Verify token is being sent in handshake
+- Check `sessions` object in server memory
 
-- 喜欢文字冒险游戏的玩家
-- 狼人杀/剧本杀爱好者
-- 宠物主人（情感共鸣）
-- 3人线上聚会场景
+## Deployment
 
-## 预估游戏时长
+### Railway Configuration
+- **Entry point**: `server.js`
+- **Node version**: 18.x (specified in package.json)
+- **Port**: Uses `process.env.PORT` (Railway auto-assigns)
+- **Static files**: Served from `public/` directory
+- **No build step required** (vanilla JS)
 
-- 第一幕：30-45分钟
-- 第二幕：15-20分钟
-- 第三幕：20-30分钟（每人）
-- 第四幕：30-60分钟
-- **总计**：约2-3小时完整体验
+### Environment Variables
+No environment variables currently required. Future additions:
+- `DATABASE_URL` (when PostgreSQL added)
+- `JWT_SECRET` (for secure authentication)
+- `NODE_ENV` (production/development)
+
+## Known Technical Debt
+
+These shortcuts were intentional for v1.0 (1-2 week timeline):
+- Plain text password storage (TODO: bcrypt hashing)
+- In-memory data (TODO: PostgreSQL migration)
+- No input sanitization (TODO: add validation middleware)
+- Hardcoded game data loading (TODO: dynamic scene loader)
+- No error recovery for disconnections (TODO: reconnection logic)
+
+## Future Architecture Plans
+
+**v1.1+**:
+- Refactor server.js into modular structure (see FOLDER_STRUCTURE.md)
+- Add PostgreSQL with Prisma ORM
+- Migrate to React frontend (Vite + Tailwind CSS)
+- Add Zustand for state management
+- Implement JWT authentication
+
+## Additional Documentation
+
+- **TECH_STACK.md**: Detailed technology decisions and rationale
+- **API_REFERENCE.md**: Complete Socket.io event specifications
+- **CODE_STANDARDS.md**: Full coding style guide
+- **DATA_FORMAT.md**: JSON data structure specifications
+- **FOLDER_STRUCTURE.md**: Planned modular architecture (future)
+- **GAME_DESIGN.md.backup**: Complete game mechanics and story design
+
+## Common Pitfalls
+
+1. **Room ID case sensitivity**: Room IDs are case-sensitive (ABC123 ≠ abc123)
+2. **Character selection order**: Must wait for all 3 players before starting game
+3. **Token expiry**: Sessions expire after 24 hours, no automatic refresh
+4. **Socket.io namespaces**: All events on default namespace `/`
+5. **File paths**: Use `path.join(__dirname, ...)` for cross-platform compatibility
+6. **JSON syntax**: Scene data files must have valid JSON (no trailing commas)
+
+## Getting Help
+
+For game design questions, refer to GAME_DESIGN.md.backup (original design document).
+For technical implementation questions, this file and the referenced docs above should cover most scenarios.

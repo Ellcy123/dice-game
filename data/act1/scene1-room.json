@@ -1,7 +1,7 @@
 {
   "sceneId": "act1-scene1",
   "sceneName": "密室",
-  "description": "你们醒来后发现被困在一个密室当中。你好像听到了有人在哭泣，密室的布局很奇怪，有一汪水潭，一个行李箱，一个衣柜。",
+  "description": "你们醒来后发现被困在一个密室当中。你好像听到了有人在哭泣,密室的布局很奇怪,有一汪水潭,一个行李箱,一个衣柜。",
 
   "characters": {
     "cat": {
@@ -9,21 +9,21 @@
       "name": "天一",
       "icon": "🐱",
       "maxHp": 8,
-      "description": "猫咪，灵活敏捷但怕水"
+      "description": "猫咪,灵活敏捷但怕水"
     },
     "dog": {
       "id": "dog",
       "name": "二水",
       "icon": "🐶",
       "maxHp": 8,
-      "description": "狗狗，力量强大且忠诚"
+      "description": "狗狗,力量强大且忠诚"
     },
     "turtle": {
       "id": "turtle",
       "name": "包子",
       "icon": "🐢",
       "maxHp": 8,
-      "description": "乌龟，防御力高且擅长游泳"
+      "description": "乌龟,防御力高且擅长游泳"
     }
   },
 
@@ -31,23 +31,24 @@
     "catCanMove": false,
     "dogCanMove": false,
     "turtleCanMove": true,
-    "description": "猫、狗无法行动，需龟与主持人对话触发关键词对应的剧情内容，拯救伙伴并逃脱。",
+    "description": "猫、狗无法行动,需龟与主持人对话触发关键词对应的剧情内容,拯救伙伴并逃脱。",
     "collectedLetters": [],
     "discoveredAreas": ["water-pond", "suitcase", "closet"],
-    "playerItems": {}
+    "playerItems": {},
+    "dogInCage": true
   },
 
   "areas": {
     "water-pond": {
       "areaId": "water-pond",
       "name": "水潭",
-      "description": "一汪清澈的水潭，水面平静如镜。",
+      "description": "一汪清澈的水潭,水面平静如镜。",
       "visible": true
     },
     "suitcase": {
       "areaId": "suitcase",
       "name": "行李箱",
-      "description": "一个带密码锁的行李箱，锁着三位数密码（000）。",
+      "description": "一个带密码锁的行李箱,锁着三位数密码(000)。",
       "visible": true,
       "locked": true,
       "password": "000"
@@ -55,38 +56,38 @@
     "closet": {
       "areaId": "closet",
       "name": "衣柜",
-      "description": "一个大衣柜，看起来很普通。",
+      "description": "一个大衣柜,看起来很普通。",
       "visible": true
     },
     "hidden-room": {
       "areaId": "hidden-room",
       "name": "小房间",
-      "description": "衣柜后的隐藏房间，房间内有一个巨大的囚笼，狗被困在其中，房间内还有一个花瓶和一个电脑。墙上有一扇只可以用四位密码触发打开的大门。",
+      "description": "衣柜后的隐藏房间,房间内有一个巨大的囚笼,狗被困在其中,房间内还有一个花瓶和一个电脑。墙上有一扇只可以用四位密码触发打开的大门。",
       "visible": false
     },
     "cage": {
       "areaId": "cage",
       "name": "囚笼",
-      "description": "小房间内的巨大囚笼，二水被困在其中。",
+      "description": "小房间内的巨大囚笼,二水被困在其中。",
       "visible": false,
       "locked": true
     },
     "vase": {
       "areaId": "vase",
       "name": "花瓶",
-      "description": "小房间内的花瓶，看起来很精致。",
+      "description": "小房间内的花瓶,看起来很精致。",
       "visible": false
     },
     "computer": {
       "areaId": "computer",
       "name": "电脑",
-      "description": "小房间内的电脑，显示器似乎坏了。",
+      "description": "小房间内的电脑,显示器似乎坏了。",
       "visible": false
     },
     "big-door": {
       "areaId": "big-door",
       "name": "大门",
-      "description": "墙上有一扇需要四位密码的大门，这是逃出去的唯一出口。",
+      "description": "墙上有一扇需要四位密码的大门,这是逃出去的唯一出口。",
       "visible": false,
       "locked": true,
       "password": "ECHO"
@@ -95,6 +96,7 @@
 
   "interactions": [
     {
+      "id": "water-turtle",
       "keyword": "水潭+龟",
       "aliases": ["水潭+包子", "包子+水潭", "龟+水潭"],
       "triggerBy": ["turtle"],
@@ -102,12 +104,11 @@
       "effect": {
         "type": "getItem",
         "itemId": "wooden-box",
-        "storyText": "包子潜入水中，凭借出色的游泳技能很快就找到了一个木盒。你把木盒带到了岸上，但发现木盒无法打开。水下似乎还有其他物品，但你无法拿取。",
-        "addToInventory": true
-      },
-      "used": false
+        "storyText": "包子潜入水中获得木盒,水下另有物品但无法拿取"
+      }
     },
     {
+      "id": "water-cat",
       "keyword": "水潭+猫",
       "aliases": ["水潭+天一", "天一+水潭", "猫+水潭"],
       "triggerBy": ["cat"],
@@ -116,11 +117,11 @@
         "type": "damage",
         "target": "cat",
         "value": -1,
-        "storyText": "天一看着水潭，想着包子能下去，我肯定也行！于是纵身一跃跳入水中。但天一不会游泳，在水中挣扎起来。好在包子及时把天一救了上来，但因为呛水，天一的生命值-1。"
-      },
-      "used": false
+        "storyText": "天一跳入水中(不会游泳),因'要面子'未呼救,生命值-1"
+      }
     },
     {
+      "id": "water-dog",
       "keyword": "水潭+狗",
       "aliases": ["水潭+二水", "二水+水潭", "狗+水潭"],
       "triggerBy": ["dog"],
@@ -128,73 +129,261 @@
       "effect": {
         "type": "getItem",
         "itemId": "monitor",
-        "storyText": "二水跳入水潭，在水底摸索了一番，从水中捞起了一个显示器。虽然湿漉漉的，但感觉还能用。",
-        "addToInventory": true
-      },
-      "used": false
+        "storyText": "从水潭捞起显示器,体感'凑凑的'"
+      }
     },
     {
+      "id": "water-suitcase",
       "keyword": "水潭+行李箱",
       "aliases": ["行李箱+水潭"],
       "triggerBy": ["cat", "dog", "turtle"],
       "condition": null,
       "effect": {
         "type": "story",
-        "storyText": "你们把行李箱推到水潭边，想做成一艘船（取名'梅利号'）。但行李箱很快就沉了下去，你们只好把它打捞上来。看来这个想法不太靠谱。"
-      },
-      "used": false
+        "storyText": "将行李箱做成'梅利号'船,船沉后取回行李箱"
+      }
     },
     {
+      "id": "water-closet",
+      "keyword": "水潭+衣柜",
+      "aliases": ["衣柜+水潭"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": null,
+      "effect": {
+        "type": "damage",
+        "target": "current",
+        "value": -1,
+        "storyText": "搬衣柜时碰头,意识到世界有引力,生命值-1"
+      }
+    },
+    {
+      "id": "water-monitor",
+      "keyword": "水潭+显示器",
+      "aliases": ["显示器+水潭"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "monitor"},
+      "effect": {
+        "type": "removeItem",
+        "itemId": "monitor",
+        "storyText": "显示器被扔回水潭后消失"
+      }
+    },
+    {
+      "id": "water-computer",
       "keyword": "水潭+电脑",
       "aliases": ["电脑+水潭"],
       "triggerBy": ["cat", "dog", "turtle"],
       "condition": {"hasItem": "computer-full"},
       "effect": {
         "type": "riverGod",
-        "storyText": "你们不小心把电脑掉进了水潭。突然，水面泛起涟漪，一个神秘的身影从水中浮现——河神出现了！\n\n河神问道：'年轻人，你掉的是这台金电脑，还是这台银电脑，还是这台普通电脑？'\n\n如果诚实回答是普通电脑，河神会赞赏你的诚实，并赐予你生命值+1的祝福。"
-      },
-      "used": false
+        "storyText": "电脑入水后出现河神,如实回答可生命值+1",
+        "truthfulReward": 1
+      }
     },
     {
+      "id": "water-key",
+      "keyword": "水潭+钥匙",
+      "aliases": ["钥匙+水潭"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "key"},
+      "effect": {
+        "type": "story",
+        "storyText": "用钥匙打水漂,被其他玩家背后吐槽'智力不健全'"
+      }
+    },
+    {
+      "id": "water-cage-dog-inside",
+      "keyword": "水潭+囚笼",
+      "aliases": ["囚笼+水潭"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"dogInCage": true},
+      "effect": {
+        "type": "damage",
+        "target": "current",
+        "value": -2,
+        "storyText": "试图浸囚笼,被二水咬伤,生命值-2"
+      }
+    },
+    {
+      "id": "water-cage-after",
+      "keyword": "水潭+囚笼",
+      "aliases": ["囚笼+水潭"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"dogInCage": false},
+      "effect": {
+        "type": "damage",
+        "target": "current",
+        "value": -1,
+        "storyText": "囚笼入水后出现河神,被打耳光,生命值-1"
+      }
+    },
+    {
+      "id": "water-vase",
+      "keyword": "水潭+花瓶",
+      "aliases": ["花瓶+水潭"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "vase"},
+      "effect": {
+        "type": "damage",
+        "target": "current",
+        "value": -1,
+        "storyText": "饮用花瓶内带细菌的水,得肠胃炎,生命值-1"
+      }
+    },
+    {
+      "id": "water-wooden-box",
+      "keyword": "水潭+木盒",
+      "aliases": ["木盒+水潭"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box"},
+      "effect": {
+        "type": "removeItem",
+        "itemId": "wooden-box",
+        "storyText": "木盒被扔回水潭后消失"
+      }
+    },
+    {
+      "id": "suitcase-turtle",
       "keyword": "行李箱+龟",
       "aliases": ["行李箱+包子", "包子+行李箱", "龟+行李箱"],
       "triggerBy": ["turtle"],
       "condition": null,
       "effect": {
-        "type": "unlockAndRescue",
+        "type": "unlock",
         "target": "cat",
-        "storyText": "包子仔细观察行李箱的密码锁，三位数字锁显示着000。包子尝试转动密码锁，咔哒一声，行李箱打开了！\n\n里面蜷缩着天一，看起来被困了很久。天一虚弱地爬了出来，活动了一下身体后，恢复了行动能力。\n\n'谢谢你，包子！'天一感激地说。",
-        "unlockCat": true
-      },
-      "used": false
+        "storyText": "行李箱带三位初始密码(000,玩家无法获取),主持人解锁后可救出猫,猫恢复行动",
+        "unlockCharacter": "cat"
+      }
     },
     {
+      "id": "suitcase-cat",
       "keyword": "行李箱+猫",
       "aliases": ["行李箱+天一", "天一+行李箱", "猫+行李箱"],
       "triggerBy": ["cat"],
-      "condition": {"catCanMove": true, "suitcaseUnlocked": true},
+      "condition": {"catCanMove": true},
       "effect": {
         "type": "getItem",
         "itemId": "key",
-        "storyText": "天一用锋利的爪子撕开了行李箱的内衬，在夹层中发现了一把钥匙！这把钥匙看起来很特别，应该能打开某个锁。",
-        "addToInventory": true
-      },
-      "used": false
+        "storyText": "天一撕烂行李箱,获得内钥匙"
+      }
     },
     {
+      "id": "suitcase-dog",
+      "keyword": "行李箱+狗",
+      "aliases": ["行李箱+二水", "二水+行李箱", "狗+行李箱"],
+      "triggerBy": ["dog"],
+      "condition": {"dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "二水标记行李箱,效果未知"
+      }
+    },
+    {
+      "id": "suitcase-monitor",
+      "keyword": "行李箱+显示器",
+      "aliases": ["显示器+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "monitor"},
+      "effect": {
+        "type": "story",
+        "storyText": "组合被吐槽'智商异于常人',建议停手"
+      }
+    },
+    {
+      "id": "suitcase-computer",
+      "keyword": "行李箱+电脑",
+      "aliases": ["电脑+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "computer-full"},
+      "effect": {
+        "type": "story",
+        "storyText": "被吐槽'打算出差',建议就医检查"
+      }
+    },
+    {
+      "id": "suitcase-key",
+      "keyword": "行李箱+钥匙",
+      "aliases": ["钥匙+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "key"},
+      "effect": {
+        "type": "removeItem",
+        "itemId": "key",
+        "storyText": "钥匙放回行李箱后消失(备注：消失物品下次触发关键词时提醒)"
+      }
+    },
+    {
+      "id": "suitcase-cage-dog-inside",
+      "keyword": "行李箱+囚笼",
+      "aliases": ["囚笼+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"dogInCage": true},
+      "effect": {
+        "type": "damage",
+        "target": "dog",
+        "value": -1,
+        "storyText": "用行李箱砸囚笼救二水,不慎砸伤二水,二水生命值-1"
+      }
+    },
+    {
+      "id": "suitcase-cage-after",
+      "keyword": "行李箱+囚笼",
+      "aliases": ["囚笼+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"dogInCage": false},
+      "effect": {
+        "type": "story",
+        "storyText": "将行李箱锁入囚笼,认为'更安全'"
+      }
+    },
+    {
+      "id": "suitcase-closet",
+      "keyword": "行李箱+衣柜",
+      "aliases": ["衣柜+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": null,
+      "effect": {
+        "type": "story",
+        "storyText": "将行李箱放入衣柜,打扫后发现并非自己的房间"
+      }
+    },
+    {
+      "id": "suitcase-vase",
+      "keyword": "行李箱+花瓶",
+      "aliases": ["花瓶+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "vase"},
+      "effect": {
+        "type": "story",
+        "storyText": "将花瓶误认作青花瓷装入,被指出仅值20元,建议放弃鉴宝"
+      }
+    },
+    {
+      "id": "suitcase-wooden-box",
+      "keyword": "行李箱+木盒",
+      "aliases": ["木盒+行李箱"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box"},
+      "effect": {
+        "type": "story",
+        "storyText": "因同情木盒'不自由',将其锁进行李箱"
+      }
+    },
+    {
+      "id": "closet-turtle",
       "keyword": "衣柜+龟",
       "aliases": ["衣柜+包子", "包子+衣柜", "龟+衣柜"],
       "triggerBy": ["turtle"],
       "condition": null,
       "effect": {
         "type": "discoverArea",
-        "areas": ["hidden-room", "cage", "vase", "computer", "big-door"],
-        "storyText": "包子在衣柜下方摸索时，突然发现了一个隐藏的按钮。按下按钮后，衣柜发出'咔嚓'一声，缓缓向旁边移动。\n\n衣柜后面居然隐藏着一个小房间！\n\n房间内有一个巨大的囚笼，二水被困在其中，正可怜巴巴地看着你们。房间里还有一个精致的花瓶和一台电脑。最重要的是，墙上有一扇需要四位密码的大门！",
-        "unlockAreas": true
-      },
-      "used": false
+        "newAreaId": "hidden-room",
+        "storyText": "龟在衣柜下方发现了一个按钮,按下去后衣柜打开了。后面居然有一个小房间。小房间：房间内有一个巨大的囚笼,狗被困在其中,房间内还有一个花瓶和一个电脑。墙上有一扇只可以用四位密码触发打开的大门",
+        "unlockItems": ["vase", "computer", "cage", "big-door"]
+      }
     },
     {
+      "id": "closet-cat",
       "keyword": "衣柜+猫",
       "aliases": ["衣柜+天一", "天一+衣柜", "猫+衣柜"],
       "triggerBy": ["cat"],
@@ -202,27 +391,129 @@
       "effect": {
         "type": "getLetter",
         "letter": "C",
-        "storyText": "天一灵巧地爬上衣柜顶部，在厚厚的灰尘中发现了一个模糊的字母：C\n\n'这个字母可能跟大门的密码有关！'天一把字母记了下来。",
-        "addLetter": true
-      },
-      "used": false
+        "storyText": "猫在衣柜上面发现了一个模模糊糊的字母：C"
+      }
     },
     {
+      "id": "closet-dog",
+      "keyword": "衣柜+狗",
+      "aliases": ["衣柜+二水", "二水+衣柜", "狗+衣柜"],
+      "triggerBy": ["dog"],
+      "condition": {"dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "二水标记衣柜,效果未知"
+      }
+    },
+    {
+      "id": "closet-monitor",
+      "keyword": "衣柜+显示器",
+      "aliases": ["显示器+衣柜"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "monitor"},
+      "effect": {
+        "type": "hint",
+        "storyText": "组合触发'作者崇拜',获得提醒'行李箱+显示器'",
+        "hintKeyword": "行李箱+显示器"
+      }
+    },
+    {
+      "id": "closet-computer",
+      "keyword": "衣柜+电脑",
+      "aliases": ["电脑+衣柜"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "computer-full"},
+      "effect": {
+        "type": "story",
+        "storyText": "将电脑放入衣柜开机,无效果,被其他玩家嘲笑"
+      }
+    },
+    {
+      "id": "closet-key",
       "keyword": "衣柜+钥匙",
       "aliases": ["钥匙+衣柜"],
       "triggerBy": ["cat", "dog", "turtle"],
       "condition": {"hasItem": "key"},
       "effect": {
-        "type": "getItem",
+        "type": "getItemAndHeal",
         "itemId": "red-crystal-heart",
-        "rewardHp": 1,
+        "value": 1,
         "reusable": true,
-        "storyText": "你们用钥匙打开了衣柜的暗格，里面放着一颗闪闪发光的红水晶心！\n\n拿起水晶心后，温暖的能量流遍全身，所有人的生命值都+1！\n\n神奇的是，暗格在关闭后又恢复了，钥匙还可以继续使用。",
-        "addToInventory": true
-      },
-      "used": false
+        "storyText": "打开衣柜暗格,获得红水晶心,食用后生命值+1(钥匙可复用)"
+      }
     },
     {
+      "id": "closet-cage-dog-inside",
+      "keyword": "衣柜+囚笼",
+      "aliases": ["囚笼+衣柜"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"dogInCage": true},
+      "effect": {
+        "type": "damage",
+        "target": "current",
+        "value": -2,
+        "storyText": "将囚笼锁入衣柜,被二水咬伤,生命值-2"
+      }
+    },
+    {
+      "id": "closet-cage-after",
+      "keyword": "衣柜+囚笼",
+      "aliases": ["囚笼+衣柜"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"dogInCage": false},
+      "effect": {
+        "type": "story",
+        "storyText": "给囚笼内的二水穿衣服(不合身),被其他玩家疏远"
+      }
+    },
+    {
+      "id": "closet-vase",
+      "keyword": "衣柜+花瓶",
+      "aliases": ["花瓶+衣柜"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "vase"},
+      "effect": {
+        "type": "story",
+        "storyText": "给花瓶穿衣服(不合身),被其他玩家疏远"
+      }
+    },
+    {
+      "id": "closet-wooden-box",
+      "keyword": "衣柜+木盒",
+      "aliases": ["木盒+衣柜"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box"},
+      "effect": {
+        "type": "damage",
+        "target": "all",
+        "value": -0.5,
+        "storyText": "将木盒放入衣柜,讲冷笑话导致其他玩家冻感冒,生命值-0.5"
+      }
+    },
+    {
+      "id": "wooden-box-turtle",
+      "keyword": "木盒+龟",
+      "aliases": ["木盒+包子", "包子+木盒", "龟+木盒"],
+      "triggerBy": ["turtle"],
+      "condition": {"hasItem": "wooden-box"},
+      "effect": {
+        "type": "story",
+        "storyText": "包子无法打开木盒"
+      }
+    },
+    {
+      "id": "wooden-box-cat",
+      "keyword": "木盒+猫",
+      "aliases": ["木盒+天一", "天一+木盒", "猫+木盒"],
+      "triggerBy": ["cat"],
+      "condition": {"hasItem": "wooden-box", "catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "天一无法打开木盒"
+      }
+    },
+    {
+      "id": "wooden-box-dog",
       "keyword": "木盒+狗",
       "aliases": ["木盒+二水", "二水+木盒", "狗+木盒"],
       "triggerBy": ["dog"],
@@ -230,12 +521,313 @@
       "effect": {
         "type": "getLetter",
         "letter": "E",
-        "storyText": "二水用强有力的牙齿咬住木盒，用力一咬——咔嚓！木盒裂开了！\n\n里面掉出一张字条，上面写着字母：E\n\n'又一个密码字母！'大家兴奋地说。",
-        "addLetter": true
-      },
-      "used": false
+        "storyText": "二水咬开木盒,获得字条'E'"
+      }
     },
     {
+      "id": "wooden-box-monitor",
+      "keyword": "木盒+显示器",
+      "aliases": ["显示器+木盒"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box", "hasItem": "monitor"},
+      "effect": {
+        "type": "destroyItem",
+        "itemId": "monitor",
+        "storyText": "木盒砸坏显示器(备注：显示器无法使用,密码需'瞎猜')"
+      }
+    },
+    {
+      "id": "wooden-box-computer",
+      "keyword": "木盒+电脑",
+      "aliases": ["电脑+木盒"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box", "hasItem": "computer-full"},
+      "effect": {
+        "type": "story",
+        "storyText": "无效果"
+      }
+    },
+    {
+      "id": "wooden-box-key",
+      "keyword": "木盒+钥匙",
+      "aliases": ["钥匙+木盒"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box", "hasItem": "key"},
+      "effect": {
+        "type": "story",
+        "storyText": "钥匙型号不匹配,无法打开木盒"
+      }
+    },
+    {
+      "id": "wooden-box-cage-dog-inside",
+      "keyword": "木盒+囚笼",
+      "aliases": ["囚笼+木盒"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box", "dogInCage": true},
+      "effect": {
+        "type": "getLetter",
+        "letter": "E",
+        "storyText": "将木盒给二水,二水咬开后获得字条'E'"
+      }
+    },
+    {
+      "id": "wooden-box-cage-after",
+      "keyword": "木盒+囚笼",
+      "aliases": ["囚笼+木盒"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box", "dogInCage": false},
+      "effect": {
+        "type": "story",
+        "storyText": "将木盒关入囚笼,被其他玩家吐槽"
+      }
+    },
+    {
+      "id": "wooden-box-vase",
+      "keyword": "木盒+花瓶",
+      "aliases": ["花瓶+木盒"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "wooden-box", "hasItem": "vase"},
+      "effect": {
+        "type": "getLetter",
+        "letter": "O",
+        "destroyItem": "vase",
+        "storyText": "花瓶砸木盒后碎裂,获得字母'O'(备注：花瓶无法使用)"
+      }
+    },
+    {
+      "id": "computer-cat",
+      "keyword": "电脑+猫",
+      "aliases": ["电脑+天一", "天一+电脑", "猫+电脑"],
+      "triggerBy": ["cat"],
+      "condition": {"hasItem": "computer-full", "catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "天一发现电脑损坏,无法维修"
+      }
+    },
+    {
+      "id": "computer-turtle",
+      "keyword": "电脑+龟",
+      "aliases": ["电脑+包子", "包子+电脑", "龟+电脑"],
+      "triggerBy": ["turtle"],
+      "condition": {"hasItem": "computer-full"},
+      "effect": {
+        "type": "story",
+        "storyText": "包子发现电脑损坏,无法维修"
+      }
+    },
+    {
+      "id": "computer-dog",
+      "keyword": "电脑+狗",
+      "aliases": ["电脑+二水", "二水+电脑", "狗+电脑"],
+      "triggerBy": ["dog"],
+      "condition": {"hasItem": "computer-full", "dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "二水标记电脑,效果未知"
+      }
+    },
+    {
+      "id": "computer-key",
+      "keyword": "电脑+钥匙",
+      "aliases": ["钥匙+电脑"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "computer-full", "hasItem": "key"},
+      "effect": {
+        "type": "story",
+        "storyText": "钥匙插入电脑后无效果"
+      }
+    },
+    {
+      "id": "computer-cage-dog-inside",
+      "keyword": "电脑+囚笼",
+      "aliases": ["囚笼+电脑"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "computer-full", "dogInCage": true},
+      "effect": {
+        "type": "story",
+        "storyText": "将电脑给二水玩,二水陷入沉思"
+      }
+    },
+    {
+      "id": "computer-cage-after",
+      "keyword": "电脑+囚笼",
+      "aliases": ["囚笼+电脑"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "computer-full", "dogInCage": false},
+      "effect": {
+        "type": "story",
+        "storyText": "将电脑关入囚笼,命名为'赛博监狱'"
+      }
+    },
+    {
+      "id": "computer-vase-basic",
+      "keyword": "电脑+花瓶",
+      "aliases": ["花瓶+电脑"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "computer-full", "hasItem": "vase", "passwordUnknown": true},
+      "effect": {
+        "type": "getLetterAndDamage",
+        "letter": "O",
+        "damage": -1,
+        "destroyItem": "vase",
+        "storyText": "用花瓶砸电脑,花瓶碎裂、手划伤,获得字母'O',生命值-1(备注：花瓶无法使用)"
+      }
+    },
+    {
+      "id": "computer-vase-password-known",
+      "keyword": "电脑+花瓶",
+      "aliases": ["花瓶+电脑"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "computer-full", "hasItem": "vase", "passwordKnown": true},
+      "effect": {
+        "type": "getLetterAndItem",
+        "letter": "O",
+        "itemId": "skip-card",
+        "destroyItem": "vase",
+        "storyText": "已知密码后砸电脑,获得字母'O',同时获得'跳关卡卡'(最后关卡可用)"
+      }
+    },
+    {
+      "id": "key-dog",
+      "keyword": "钥匙+狗",
+      "aliases": ["钥匙+二水", "二水+钥匙", "狗+钥匙"],
+      "triggerBy": ["dog"],
+      "condition": {"hasItem": "key", "dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "将钥匙含在嘴里(个人习惯)"
+      }
+    },
+    {
+      "id": "key-cat",
+      "keyword": "钥匙+猫",
+      "aliases": ["钥匙+天一", "天一+钥匙", "猫+钥匙"],
+      "triggerBy": ["cat"],
+      "condition": {"hasItem": "key", "catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "用钥匙挠后背,体感舒适"
+      }
+    },
+    {
+      "id": "key-turtle",
+      "keyword": "钥匙+龟",
+      "aliases": ["钥匙+包子", "包子+钥匙", "龟+钥匙"],
+      "triggerBy": ["turtle"],
+      "condition": {"hasItem": "key"},
+      "effect": {
+        "type": "story",
+        "storyText": "认为钥匙用于打开'桌扇门'"
+      }
+    },
+    {
+      "id": "key-monitor",
+      "keyword": "钥匙+显示器",
+      "aliases": ["显示器+钥匙"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "key", "hasItem": "monitor"},
+      "effect": {
+        "type": "destroyItem",
+        "itemId": "monitor",
+        "storyText": "用钥匙砸显示器,显示器损坏(备注：显示器无法使用,密码需'瞎猜')"
+      }
+    },
+    {
+      "id": "key-cage-dog-inside",
+      "keyword": "钥匙+囚笼",
+      "aliases": ["囚笼+钥匙"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "key", "dogInCage": true},
+      "effect": {
+        "type": "unlock",
+        "target": "dog",
+        "unlockCharacter": "dog",
+        "storyText": "打开囚笼,二水恢复行动"
+      }
+    },
+    {
+      "id": "key-cage-after",
+      "keyword": "钥匙+囚笼",
+      "aliases": ["囚笼+钥匙"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "key", "dogInCage": false},
+      "effect": {
+        "type": "story",
+        "storyText": "将囚笼重新锁上"
+      }
+    },
+    {
+      "id": "key-vase",
+      "keyword": "钥匙+花瓶",
+      "aliases": ["花瓶+钥匙"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "key", "hasItem": "vase"},
+      "effect": {
+        "type": "story",
+        "storyText": "试图用钥匙打开花瓶,被建议就医检查"
+      }
+    },
+    {
+      "id": "monitor-cat",
+      "keyword": "显示器+猫",
+      "aliases": ["显示器+天一", "天一+显示器", "猫+显示器"],
+      "triggerBy": ["cat"],
+      "condition": {"hasItem": "monitor", "catCanMove": true},
+      "effect": {
+        "type": "destroyItem",
+        "itemId": "monitor",
+        "storyText": "天一砸坏显示器,显示器消失(备注：显示器无法使用,密码需'瞎猜')"
+      }
+    },
+    {
+      "id": "monitor-dog",
+      "keyword": "显示器+狗",
+      "aliases": ["显示器+二水", "二水+显示器", "狗+显示器"],
+      "triggerBy": ["dog"],
+      "condition": {"hasItem": "monitor", "dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "发现显示器防水,性能优于当前电脑"
+      }
+    },
+    {
+      "id": "monitor-turtle",
+      "keyword": "显示器+龟",
+      "aliases": ["显示器+包子", "包子+显示器", "龟+显示器"],
+      "triggerBy": ["turtle"],
+      "condition": {"hasItem": "monitor"},
+      "effect": {
+        "type": "heal",
+        "value": 1,
+        "storyText": "通过显示器反光'臭美',生命值+1"
+      }
+    },
+    {
+      "id": "monitor-suitcase",
+      "keyword": "显示器+行李箱",
+      "aliases": ["行李箱+显示器"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "monitor"},
+      "effect": {
+        "type": "hint",
+        "hintKeyword": "显示器+衣柜",
+        "storyText": "获得提醒'显示器+衣柜'"
+      }
+    },
+    {
+      "id": "monitor-closet-hint",
+      "keyword": "显示器+衣柜",
+      "aliases": ["衣柜+显示器"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "monitor"},
+      "effect": {
+        "type": "story",
+        "storyText": "组合被夸'天才',触发'作者崇拜'"
+      }
+    },
+    {
+      "id": "monitor-computer",
       "keyword": "显示器+电脑",
       "aliases": ["电脑+显示器"],
       "triggerBy": ["cat", "dog", "turtle"],
@@ -243,74 +835,211 @@
       "effect": {
         "type": "getLetter",
         "letter": "H",
-        "storyText": "你们把从水潭捞起的显示器接到电脑上，按下电源键。电脑屏幕亮了起来，显示着一个大大的字母：H\n\n'太好了，又一个字母！'",
-        "addLetter": true,
-        "createItem": "computer-full"
-      },
-      "used": false
+        "storyText": "更换显示器后打开电脑,获得字母'H'"
+      }
     },
     {
-      "keyword": "钥匙+囚笼",
-      "aliases": ["囚笼+钥匙"],
-      "triggerBy": ["cat", "turtle"],
-      "condition": {"hasItem": "key", "areaDiscovered": "cage"},
-      "effect": {
-        "type": "unlockAndRescue",
-        "target": "dog",
-        "storyText": "你们用钥匙打开了囚笼的锁，二水兴奋地冲了出来！\n\n'终于自由了！谢谢你们！'二水摇着尾巴说道。\n\n二水恢复了行动能力。",
-        "unlockDog": true
-      },
-      "used": false
-    },
-    {
-      "keyword": "花瓶",
-      "aliases": ["查看花瓶", "检查花瓶"],
+      "id": "monitor-vase",
+      "keyword": "显示器+花瓶",
+      "aliases": ["花瓶+显示器"],
       "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"areaDiscovered": "vase"},
+      "condition": {"hasItem": "monitor", "hasItem": "vase"},
       "effect": {
-        "type": "getLetter",
-        "letter": "O",
-        "storyText": "你们仔细查看花瓶，发现瓶底刻着一个字母：O\n\n'现在我们有C、H、E、O四个字母了！'",
-        "addLetter": true
-      },
-      "used": false
+        "type": "hint",
+        "hintKeyword": "显示器+衣柜",
+        "storyText": "获得提醒'显示器+衣柜'"
+      }
+    },
+    {
+      "id": "vase-cat",
+      "keyword": "花瓶+猫",
+      "aliases": ["花瓶+天一", "天一+花瓶", "猫+花瓶"],
+      "triggerBy": ["cat"],
+      "condition": {"hasItem": "vase", "catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "你把脑袋探进了花瓶当中。观察到瓶内居然有一个字母:O"
+      }
+    },
+    {
+      "id": "vase-dog",
+      "keyword": "花瓶+狗",
+      "aliases": ["花瓶+二水", "二水+花瓶", "狗+花瓶"],
+      "triggerBy": ["dog"],
+      "condition": {"hasItem": "vase", "dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "二水标记花瓶,效果未知"
+      }
+    },
+    {
+      "id": "vase-turtle",
+      "keyword": "花瓶+龟",
+      "aliases": ["花瓶+包子", "包子+花瓶", "龟+花瓶"],
+      "triggerBy": ["turtle"],
+      "condition": {"hasItem": "vase"},
+      "effect": {
+        "type": "story",
+        "storyText": "未发现花瓶玄机,让其他玩家尝试"
+      }
+    },
+    {
+      "id": "vase-cage-dog-inside",
+      "keyword": "花瓶+囚笼",
+      "aliases": ["囚笼+花瓶"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "vase", "dogInCage": true},
+      "effect": {
+        "type": "destroyItem",
+        "itemId": "vase",
+        "storyText": "将花瓶递给二水,二水将其弄坏"
+      }
+    },
+    {
+      "id": "vase-cage-after",
+      "keyword": "花瓶+囚笼",
+      "aliases": ["囚笼+花瓶"],
+      "triggerBy": ["cat", "dog", "turtle"],
+      "condition": {"hasItem": "vase", "dogInCage": false},
+      "effect": {
+        "type": "story",
+        "storyText": "将花瓶关入囚笼,无效果(仅被其他玩家嘲笑)"
+      }
+    },
+    {
+      "id": "cat-cage-dog-inside",
+      "keyword": "猫+囚笼",
+      "aliases": ["猫+二水", "天一+囚笼", "囚笼+猫"],
+      "triggerBy": ["cat"],
+      "condition": {"dogInCage": true, "catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "猫嘲笑被囚的狗,被狗怒骂"
+      }
+    },
+    {
+      "id": "turtle-cage-dog-inside",
+      "keyword": "龟+囚笼",
+      "aliases": ["龟+二水", "包子+囚笼", "囚笼+龟"],
+      "triggerBy": ["turtle"],
+      "condition": {"dogInCage": true},
+      "effect": {
+        "type": "story",
+        "storyText": "包子安慰二水,称会想办法救他"
+      }
+    },
+    {
+      "id": "cat-cage-after",
+      "keyword": "猫+囚笼",
+      "aliases": ["天一+囚笼", "囚笼+猫"],
+      "triggerBy": ["cat"],
+      "condition": {"dogInCage": false, "catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "天一将自己关入囚笼,称'好玩'并让其他人救自己"
+      }
+    },
+    {
+      "id": "turtle-cage-check",
+      "keyword": "龟+囚笼",
+      "aliases": ["包子+囚笼", "囚笼+龟"],
+      "triggerBy": ["turtle"],
+      "condition": {"dogInCage": false},
+      "effect": {
+        "type": "getItem",
+        "itemId": "skip-card",
+        "storyText": "包子检查囚笼下方,获得跳关卡卡(最后关卡可用)"
+      }
+    },
+    {
+      "id": "dog-cage",
+      "keyword": "狗+囚笼",
+      "aliases": ["二水+囚笼", "囚笼+狗"],
+      "triggerBy": ["dog"],
+      "condition": {"dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "二水标记囚笼,效果未知"
+      }
+    },
+    {
+      "id": "cat-dog",
+      "keyword": "猫+狗",
+      "aliases": ["猫+二水", "天一+狗", "天一+二水", "狗+猫", "二水+猫"],
+      "triggerBy": ["cat"],
+      "condition": {"catCanMove": true, "dogCanMove": true},
+      "effect": {
+        "type": "damage",
+        "target": "cat",
+        "value": -1,
+        "storyText": "天一嘲讽二水身材,二人打架,天一惨败,生命值-1"
+      }
+    },
+    {
+      "id": "cat-turtle",
+      "keyword": "猫+龟",
+      "aliases": ["猫+包子", "天一+龟", "天一+包子", "龟+猫", "包子+猫"],
+      "triggerBy": ["cat"],
+      "condition": {"catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "天一嘲笑包子'长得奇怪',包子未理会"
+      }
+    },
+    {
+      "id": "dog-turtle",
+      "keyword": "狗+龟",
+      "aliases": ["狗+包子", "二水+龟", "二水+包子", "龟+狗", "包子+狗"],
+      "triggerBy": ["dog"],
+      "condition": {"dogCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "二水感谢包子救自己,约定共同弄清处境"
+      }
+    },
+    {
+      "id": "dog-cat-bond",
+      "keyword": "狗+猫",
+      "aliases": ["二水+猫", "二水+天一"],
+      "triggerBy": ["dog"],
+      "condition": {"dogCanMove": true, "catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "二水与天一互感'眼熟',认为有特殊羁绊"
+      }
+    },
+    {
+      "id": "turtle-cat-urge",
+      "keyword": "龟+猫",
+      "aliases": ["包子+猫", "包子+天一"],
+      "triggerBy": ["turtle"],
+      "condition": {"catCanMove": true},
+      "effect": {
+        "type": "story",
+        "storyText": "包子督促天一行动,天一吐槽包子是'装货'"
+      }
+    },
+    {
+      "id": "turtle-dog-teach",
+      "keyword": "龟+狗",
+      "aliases": ["包子+狗", "包子+二水"],
+      "triggerBy": ["turtle"],
+      "condition": {"dogCanMove": true},
+      "effect": {
+        "type": "heal",
+        "target": "dog",
+        "value": 1,
+        "storyText": "包子教二水强身方法,二水学会后生命值+1"
+      }
     }
   ],
-
-  "items": {
-    "wooden-box": {
-      "itemId": "wooden-box",
-      "name": "木盒",
-      "description": "从水潭中获得的神秘木盒，似乎需要强力才能打开"
-    },
-    "monitor": {
-      "itemId": "monitor",
-      "name": "显示器",
-      "description": "从水潭捞起的显示器，虽然湿了但还能用"
-    },
-    "key": {
-      "itemId": "key",
-      "name": "钥匙",
-      "description": "从行李箱夹层中找到的钥匙，可以重复使用"
-    },
-    "red-crystal-heart": {
-      "itemId": "red-crystal-heart",
-      "name": "红水晶心",
-      "description": "闪闪发光的红水晶心，蕴含生命能量"
-    },
-    "computer-full": {
-      "itemId": "computer-full",
-      "name": "完整的电脑",
-      "description": "接上显示器的完整电脑"
-    }
-  },
 
   "winCondition": {
     "type": "password",
     "password": "ECHO",
     "door": "big-door",
     "requiredLetters": ["C", "H", "E", "O"],
-    "description": "收集字母C、H、E、O，组合成密码'ECHO'即可打开大门逃出密室",
-    "successText": "你们输入密码'ECHO'，大门发出沉重的响声，缓缓打开了！\n\n光芒从门外照射进来，你们终于可以逃出这个密室了！\n\n恭喜你们通过了第一关：密室逃脱！"
+    "description": "输入四位密码'ECHO'(由之前获得的字母C、E、O、H组合)可打开大门",
+    "successText": "凭智慧打开密室大门,完成第一关"
   }
 }
