@@ -218,6 +218,30 @@ function replacePlayerNames(text, players, currentPlayerId = null) {
   return result;
 }
 
+// 将玩家输入的名字转换为角色类型（用于关键词匹配）
+function normalizeKeywordWithPlayerNames(keyword, players) {
+  if (!keyword) return keyword;
+
+  let result = keyword;
+
+  // 构建玩家名字到角色类型的映射
+  const nameToRole = {};
+  Object.values(players).forEach(player => {
+    if (player.character && player.character.id && player.name) {
+      // 同时支持完整名字和小写版本
+      nameToRole[player.name.toLowerCase()] = player.character.id;
+    }
+  });
+
+  // 将玩家名字替换为角色类型
+  Object.entries(nameToRole).forEach(([playerName, roleId]) => {
+    const regex = new RegExp(playerName, 'gi');
+    result = result.replace(regex, roleId);
+  });
+
+  return result;
+}
+
 // 处理交互效果
 function applyEffect(effect, gameState, players, roomId, io, currentPlayerId = null) {
   const results = {
@@ -570,7 +594,8 @@ io.on('connection', (socket) => {
     }
 
     // 查找匹配的交互
-    const normalizedKeyword = keyword.trim().toLowerCase();
+    // 先将玩家名字转换为角色类型，例如 "水潭+小明" -> "water+cat"
+    const normalizedKeyword = normalizeKeywordWithPlayerNames(keyword, room.players).trim().toLowerCase();
     let matchedInteraction = null;
 
     for (const interaction of sceneData.interactions) {
@@ -596,9 +621,11 @@ io.on('connection', (socket) => {
     }
 
     if (!matchedInteraction) {
+      // 构建包含玩家名字的提示
+      const playerNamesList = Object.values(room.players).map(p => p.name).join('、');
       socket.emit('keywordResult', {
         success: false,
-        message: '没有找到匹配的关键词，请尝试其他组合。提示：格式如"水潭+龟"或"行李箱+猫"'
+        message: `没有找到匹配的关键词，请尝试其他组合。提示：格式如"道具+玩家名"，例如"水潭+${Object.values(room.players)[0]?.name || '玩家名'}"`
       });
       return;
     }

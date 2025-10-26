@@ -2,42 +2,43 @@
   "sceneId": "act1-scene1",
   "sceneName": "密室",
   "description": "你们醒来后发现被困在一个密室当中。你好像听到了有人在哭泣,密室的布局很奇怪,有一汪水潭,一个行李箱,一个衣柜。",
-
   "characters": {
     "cat": {
       "id": "cat",
-      "name": "猫",
-      "icon": "🐱",
+      "name": "角色A",
+      "icon": "❓",
       "maxHp": 8,
-      "description": "猫咪,灵活敏捷但怕水"
+      "description": "灵活敏捷但怕水"
     },
     "dog": {
       "id": "dog",
-      "name": "狗",
-      "icon": "🐶",
+      "name": "角色B",
+      "icon": "❓",
       "maxHp": 8,
-      "description": "狗狗,力量强大且忠诚"
+      "description": "力量强大且忠诚"
     },
     "turtle": {
       "id": "turtle",
-      "name": "龟",
-      "icon": "🐢",
+      "name": "角色C",
+      "icon": "❓",
       "maxHp": 8,
-      "description": "乌龟,防御力高且擅长游泳"
+      "description": "防御高擅长游泳"
     }
   },
-
   "initialState": {
     "catCanMove": false,
     "dogCanMove": false,
     "turtleCanMove": true,
     "description": "猫、狗无法行动,需龟与主持人对话触发关键词对应的剧情内容,拯救伙伴并逃脱。",
     "collectedLetters": [],
-    "discoveredAreas": ["water-pond", "suitcase", "closet"],
+    "discoveredAreas": [
+      "water-pond",
+      "suitcase",
+      "closet"
+    ],
     "playerItems": {},
     "dogInCage": true
   },
-
   "areas": {
     "water-pond": {
       "areaId": "water-pond",
@@ -93,13 +94,17 @@
       "password": "ECHO"
     }
   },
-
   "interactions": [
     {
       "id": "water-turtle",
-      "keyword": "水潭+龟",
-      "aliases": ["水潭+{turtle}", "{turtle}+水潭", "龟+水潭"],
-      "triggerBy": ["turtle"],
+      "keyword": "水潭+turtle",
+      "aliases": [
+        "水潭+{turtle}",
+        "{turtle}+水潭"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
       "condition": null,
       "effect": {
         "type": "getItem",
@@ -109,10 +114,17 @@
     },
     {
       "id": "water-cat",
-      "keyword": "水潭+猫",
-      "aliases": ["水潭+{cat}", "{cat}+水潭", "猫+水潭"],
-      "triggerBy": ["cat"],
-      "condition": {"catCanMove": true},
+      "keyword": "水潭+cat",
+      "aliases": [
+        "水潭+{cat}",
+        "{cat}+水潭"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "catCanMove": true
+      },
       "effect": {
         "type": "damage",
         "target": "cat",
@@ -122,10 +134,17 @@
     },
     {
       "id": "water-dog",
-      "keyword": "水潭+狗",
-      "aliases": ["水潭+{dog}", "{dog}+水潭", "狗+水潭"],
-      "triggerBy": ["dog"],
-      "condition": {"dogCanMove": true},
+      "keyword": "水潭+dog",
+      "aliases": [
+        "水潭+{dog}",
+        "{dog}+水潭"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "dogCanMove": true
+      },
       "effect": {
         "type": "getItem",
         "itemId": "monitor",
@@ -135,8 +154,14 @@
     {
       "id": "water-suitcase",
       "keyword": "水潭+行李箱",
-      "aliases": ["行李箱+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
+      "aliases": [
+        "行李箱+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
       "condition": null,
       "effect": {
         "type": "story",
@@ -146,8 +171,14 @@
     {
       "id": "water-closet",
       "keyword": "水潭+衣柜",
-      "aliases": ["衣柜+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
+      "aliases": [
+        "衣柜+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
       "condition": null,
       "effect": {
         "type": "damage",
@@ -159,9 +190,17 @@
     {
       "id": "water-monitor",
       "keyword": "水潭+显示器",
-      "aliases": ["显示器+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "monitor"},
+      "aliases": [
+        "显示器+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "removeItem",
         "itemId": "monitor",
@@ -171,9 +210,17 @@
     {
       "id": "water-computer",
       "keyword": "水潭+电脑",
-      "aliases": ["电脑+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full"},
+      "aliases": [
+        "电脑+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "computer-full"
+      },
       "effect": {
         "type": "riverGod",
         "storyText": "电脑入水后出现河神,如实回答可生命值+1",
@@ -183,9 +230,17 @@
     {
       "id": "water-key",
       "keyword": "水潭+钥匙",
-      "aliases": ["钥匙+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "key"},
+      "aliases": [
+        "钥匙+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key"
+      },
       "effect": {
         "type": "story",
         "storyText": "用钥匙打水漂,被其他玩家背后吐槽'智力不健全'"
@@ -194,9 +249,17 @@
     {
       "id": "water-cage-dog-inside",
       "keyword": "水潭+囚笼",
-      "aliases": ["囚笼+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"dogInCage": true},
+      "aliases": [
+        "囚笼+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": true
+      },
       "effect": {
         "type": "damage",
         "target": "current",
@@ -207,9 +270,17 @@
     {
       "id": "water-cage-after",
       "keyword": "水潭+囚笼",
-      "aliases": ["囚笼+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"dogInCage": false},
+      "aliases": [
+        "囚笼+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": false
+      },
       "effect": {
         "type": "damage",
         "target": "current",
@@ -220,9 +291,17 @@
     {
       "id": "water-vase",
       "keyword": "水潭+花瓶",
-      "aliases": ["花瓶+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "vase"},
+      "aliases": [
+        "花瓶+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase"
+      },
       "effect": {
         "type": "damage",
         "target": "current",
@@ -233,9 +312,17 @@
     {
       "id": "water-wooden-box",
       "keyword": "水潭+木盒",
-      "aliases": ["木盒+水潭"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box"},
+      "aliases": [
+        "木盒+水潭"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "wooden-box"
+      },
       "effect": {
         "type": "removeItem",
         "itemId": "wooden-box",
@@ -244,9 +331,14 @@
     },
     {
       "id": "suitcase-turtle",
-      "keyword": "行李箱+龟",
-      "aliases": ["行李箱+{turtle}", "{turtle}+行李箱", "龟+行李箱"],
-      "triggerBy": ["turtle"],
+      "keyword": "行李箱+turtle",
+      "aliases": [
+        "行李箱+{turtle}",
+        "{turtle}+行李箱"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
       "condition": null,
       "effect": {
         "type": "unlock",
@@ -257,10 +349,17 @@
     },
     {
       "id": "suitcase-cat",
-      "keyword": "行李箱+猫",
-      "aliases": ["行李箱+{cat}", "{cat}+行李箱", "猫+行李箱"],
-      "triggerBy": ["cat"],
-      "condition": {"catCanMove": true},
+      "keyword": "行李箱+cat",
+      "aliases": [
+        "行李箱+{cat}",
+        "{cat}+行李箱"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "catCanMove": true
+      },
       "effect": {
         "type": "getItem",
         "itemId": "key",
@@ -269,10 +368,17 @@
     },
     {
       "id": "suitcase-dog",
-      "keyword": "行李箱+狗",
-      "aliases": ["行李箱+{dog}", "{dog}+行李箱", "狗+行李箱"],
-      "triggerBy": ["dog"],
-      "condition": {"dogCanMove": true},
+      "keyword": "行李箱+dog",
+      "aliases": [
+        "行李箱+{dog}",
+        "{dog}+行李箱"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{dog}标记行李箱,效果未知"
@@ -281,9 +387,17 @@
     {
       "id": "suitcase-monitor",
       "keyword": "行李箱+显示器",
-      "aliases": ["显示器+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "monitor"},
+      "aliases": [
+        "显示器+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "story",
         "storyText": "组合被吐槽'智商异于常人',建议停手"
@@ -292,9 +406,17 @@
     {
       "id": "suitcase-computer",
       "keyword": "行李箱+电脑",
-      "aliases": ["电脑+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full"},
+      "aliases": [
+        "电脑+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "computer-full"
+      },
       "effect": {
         "type": "story",
         "storyText": "被吐槽'打算出差',建议就医检查"
@@ -303,9 +425,17 @@
     {
       "id": "suitcase-key",
       "keyword": "行李箱+钥匙",
-      "aliases": ["钥匙+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "key"},
+      "aliases": [
+        "钥匙+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key"
+      },
       "effect": {
         "type": "removeItem",
         "itemId": "key",
@@ -315,9 +445,17 @@
     {
       "id": "suitcase-cage-dog-inside",
       "keyword": "行李箱+囚笼",
-      "aliases": ["囚笼+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"dogInCage": true},
+      "aliases": [
+        "囚笼+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": true
+      },
       "effect": {
         "type": "damage",
         "target": "dog",
@@ -328,9 +466,17 @@
     {
       "id": "suitcase-cage-after",
       "keyword": "行李箱+囚笼",
-      "aliases": ["囚笼+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"dogInCage": false},
+      "aliases": [
+        "囚笼+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": false
+      },
       "effect": {
         "type": "story",
         "storyText": "将行李箱锁入囚笼,认为'更安全'"
@@ -339,8 +485,14 @@
     {
       "id": "suitcase-closet",
       "keyword": "行李箱+衣柜",
-      "aliases": ["衣柜+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
+      "aliases": [
+        "衣柜+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
       "condition": null,
       "effect": {
         "type": "story",
@@ -350,9 +502,17 @@
     {
       "id": "suitcase-vase",
       "keyword": "行李箱+花瓶",
-      "aliases": ["花瓶+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "vase"},
+      "aliases": [
+        "花瓶+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase"
+      },
       "effect": {
         "type": "story",
         "storyText": "将花瓶误认作青花瓷装入,被指出仅值20元,建议放弃鉴宝"
@@ -361,9 +521,17 @@
     {
       "id": "suitcase-wooden-box",
       "keyword": "行李箱+木盒",
-      "aliases": ["木盒+行李箱"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box"},
+      "aliases": [
+        "木盒+行李箱"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "wooden-box"
+      },
       "effect": {
         "type": "story",
         "storyText": "因同情木盒'不自由',将其锁进行李箱"
@@ -371,23 +539,40 @@
     },
     {
       "id": "closet-turtle",
-      "keyword": "衣柜+龟",
-      "aliases": ["衣柜+{turtle}", "{turtle}+衣柜", "龟+衣柜"],
-      "triggerBy": ["turtle"],
+      "keyword": "衣柜+turtle",
+      "aliases": [
+        "衣柜+{turtle}",
+        "{turtle}+衣柜"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
       "condition": null,
       "effect": {
         "type": "discoverArea",
         "newAreaId": "hidden-room",
         "storyText": "龟在衣柜下方发现了一个按钮,按下去后衣柜打开了。后面居然有一个小房间。小房间：房间内有一个巨大的囚笼,狗被困在其中,房间内还有一个花瓶和一个电脑。墙上有一扇只可以用四位密码触发打开的大门",
-        "unlockItems": ["vase", "computer", "cage", "big-door"]
+        "unlockItems": [
+          "vase",
+          "computer",
+          "cage",
+          "big-door"
+        ]
       }
     },
     {
       "id": "closet-cat",
-      "keyword": "衣柜+猫",
-      "aliases": ["衣柜+{cat}", "{cat}+衣柜", "猫+衣柜"],
-      "triggerBy": ["cat"],
-      "condition": {"catCanMove": true},
+      "keyword": "衣柜+cat",
+      "aliases": [
+        "衣柜+{cat}",
+        "{cat}+衣柜"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "catCanMove": true
+      },
       "effect": {
         "type": "getLetter",
         "letter": "C",
@@ -396,10 +581,17 @@
     },
     {
       "id": "closet-dog",
-      "keyword": "衣柜+狗",
-      "aliases": ["衣柜+{dog}", "{dog}+衣柜", "狗+衣柜"],
-      "triggerBy": ["dog"],
-      "condition": {"dogCanMove": true},
+      "keyword": "衣柜+dog",
+      "aliases": [
+        "衣柜+{dog}",
+        "{dog}+衣柜"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{dog}标记衣柜,效果未知"
@@ -408,9 +600,17 @@
     {
       "id": "closet-monitor",
       "keyword": "衣柜+显示器",
-      "aliases": ["显示器+衣柜"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "monitor"},
+      "aliases": [
+        "显示器+衣柜"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "hint",
         "storyText": "组合触发'作者崇拜',获得提醒'行李箱+显示器'",
@@ -420,9 +620,17 @@
     {
       "id": "closet-computer",
       "keyword": "衣柜+电脑",
-      "aliases": ["电脑+衣柜"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full"},
+      "aliases": [
+        "电脑+衣柜"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "computer-full"
+      },
       "effect": {
         "type": "story",
         "storyText": "将电脑放入衣柜开机,无效果,被其他玩家嘲笑"
@@ -431,9 +639,17 @@
     {
       "id": "closet-key",
       "keyword": "衣柜+钥匙",
-      "aliases": ["钥匙+衣柜"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "key"},
+      "aliases": [
+        "钥匙+衣柜"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key"
+      },
       "effect": {
         "type": "getItemAndHeal",
         "itemId": "red-crystal-heart",
@@ -445,9 +661,17 @@
     {
       "id": "closet-cage-dog-inside",
       "keyword": "衣柜+囚笼",
-      "aliases": ["囚笼+衣柜"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"dogInCage": true},
+      "aliases": [
+        "囚笼+衣柜"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": true
+      },
       "effect": {
         "type": "damage",
         "target": "current",
@@ -458,9 +682,17 @@
     {
       "id": "closet-cage-after",
       "keyword": "衣柜+囚笼",
-      "aliases": ["囚笼+衣柜"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"dogInCage": false},
+      "aliases": [
+        "囚笼+衣柜"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": false
+      },
       "effect": {
         "type": "story",
         "storyText": "给囚笼内的{dog}穿衣服(不合身),被其他玩家疏远"
@@ -469,9 +701,17 @@
     {
       "id": "closet-vase",
       "keyword": "衣柜+花瓶",
-      "aliases": ["花瓶+衣柜"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "vase"},
+      "aliases": [
+        "花瓶+衣柜"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase"
+      },
       "effect": {
         "type": "story",
         "storyText": "给花瓶穿衣服(不合身),被其他玩家疏远"
@@ -480,9 +720,17 @@
     {
       "id": "closet-wooden-box",
       "keyword": "衣柜+木盒",
-      "aliases": ["木盒+衣柜"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box"},
+      "aliases": [
+        "木盒+衣柜"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "wooden-box"
+      },
       "effect": {
         "type": "damage",
         "target": "all",
@@ -492,10 +740,17 @@
     },
     {
       "id": "wooden-box-turtle",
-      "keyword": "木盒+龟",
-      "aliases": ["木盒+{turtle}", "{turtle}+木盒", "龟+木盒"],
-      "triggerBy": ["turtle"],
-      "condition": {"hasItem": "wooden-box"},
+      "keyword": "木盒+turtle",
+      "aliases": [
+        "木盒+{turtle}",
+        "{turtle}+木盒"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "wooden-box"
+      },
       "effect": {
         "type": "story",
         "storyText": "{turtle}无法打开木盒"
@@ -503,10 +758,18 @@
     },
     {
       "id": "wooden-box-cat",
-      "keyword": "木盒+猫",
-      "aliases": ["木盒+{cat}", "{cat}+木盒", "猫+木盒"],
-      "triggerBy": ["cat"],
-      "condition": {"hasItem": "wooden-box", "catCanMove": true},
+      "keyword": "木盒+cat",
+      "aliases": [
+        "木盒+{cat}",
+        "{cat}+木盒"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "hasItem": "wooden-box",
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{cat}无法打开木盒"
@@ -514,10 +777,18 @@
     },
     {
       "id": "wooden-box-dog",
-      "keyword": "木盒+狗",
-      "aliases": ["木盒+{dog}", "{dog}+木盒", "狗+木盒"],
-      "triggerBy": ["dog"],
-      "condition": {"hasItem": "wooden-box", "dogCanMove": true},
+      "keyword": "木盒+dog",
+      "aliases": [
+        "木盒+{dog}",
+        "{dog}+木盒"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "hasItem": "wooden-box",
+        "dogCanMove": true
+      },
       "effect": {
         "type": "getLetter",
         "letter": "E",
@@ -527,9 +798,17 @@
     {
       "id": "wooden-box-monitor",
       "keyword": "木盒+显示器",
-      "aliases": ["显示器+木盒"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box", "hasItem": "monitor"},
+      "aliases": [
+        "显示器+木盒"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "destroyItem",
         "itemId": "monitor",
@@ -539,9 +818,17 @@
     {
       "id": "wooden-box-computer",
       "keyword": "木盒+电脑",
-      "aliases": ["电脑+木盒"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box", "hasItem": "computer-full"},
+      "aliases": [
+        "电脑+木盒"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "computer-full"
+      },
       "effect": {
         "type": "story",
         "storyText": "无效果"
@@ -550,9 +837,17 @@
     {
       "id": "wooden-box-key",
       "keyword": "木盒+钥匙",
-      "aliases": ["钥匙+木盒"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box", "hasItem": "key"},
+      "aliases": [
+        "钥匙+木盒"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key"
+      },
       "effect": {
         "type": "story",
         "storyText": "钥匙型号不匹配,无法打开木盒"
@@ -561,9 +856,18 @@
     {
       "id": "wooden-box-cage-dog-inside",
       "keyword": "木盒+囚笼",
-      "aliases": ["囚笼+木盒"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box", "dogInCage": true},
+      "aliases": [
+        "囚笼+木盒"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "wooden-box",
+        "dogInCage": true
+      },
       "effect": {
         "type": "getLetter",
         "letter": "E",
@@ -573,9 +877,18 @@
     {
       "id": "wooden-box-cage-after",
       "keyword": "木盒+囚笼",
-      "aliases": ["囚笼+木盒"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box", "dogInCage": false},
+      "aliases": [
+        "囚笼+木盒"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "wooden-box",
+        "dogInCage": false
+      },
       "effect": {
         "type": "story",
         "storyText": "将木盒关入囚笼,被其他玩家吐槽"
@@ -584,9 +897,17 @@
     {
       "id": "wooden-box-vase",
       "keyword": "木盒+花瓶",
-      "aliases": ["花瓶+木盒"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "wooden-box", "hasItem": "vase"},
+      "aliases": [
+        "花瓶+木盒"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase"
+      },
       "effect": {
         "type": "getLetter",
         "letter": "O",
@@ -596,10 +917,18 @@
     },
     {
       "id": "computer-cat",
-      "keyword": "电脑+猫",
-      "aliases": ["电脑+{cat}", "{cat}+电脑", "猫+电脑"],
-      "triggerBy": ["cat"],
-      "condition": {"hasItem": "computer-full", "catCanMove": true},
+      "keyword": "电脑+cat",
+      "aliases": [
+        "电脑+{cat}",
+        "{cat}+电脑"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "hasItem": "computer-full",
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{cat}发现电脑损坏,无法维修"
@@ -607,10 +936,17 @@
     },
     {
       "id": "computer-turtle",
-      "keyword": "电脑+龟",
-      "aliases": ["电脑+{turtle}", "{turtle}+电脑", "龟+电脑"],
-      "triggerBy": ["turtle"],
-      "condition": {"hasItem": "computer-full"},
+      "keyword": "电脑+turtle",
+      "aliases": [
+        "电脑+{turtle}",
+        "{turtle}+电脑"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "computer-full"
+      },
       "effect": {
         "type": "story",
         "storyText": "{turtle}发现电脑损坏,无法维修"
@@ -618,10 +954,18 @@
     },
     {
       "id": "computer-dog",
-      "keyword": "电脑+狗",
-      "aliases": ["电脑+{dog}", "{dog}+电脑", "狗+电脑"],
-      "triggerBy": ["dog"],
-      "condition": {"hasItem": "computer-full", "dogCanMove": true},
+      "keyword": "电脑+dog",
+      "aliases": [
+        "电脑+{dog}",
+        "{dog}+电脑"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "hasItem": "computer-full",
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{dog}标记电脑,效果未知"
@@ -630,9 +974,17 @@
     {
       "id": "computer-key",
       "keyword": "电脑+钥匙",
-      "aliases": ["钥匙+电脑"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full", "hasItem": "key"},
+      "aliases": [
+        "钥匙+电脑"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key"
+      },
       "effect": {
         "type": "story",
         "storyText": "钥匙插入电脑后无效果"
@@ -641,9 +993,18 @@
     {
       "id": "computer-cage-dog-inside",
       "keyword": "电脑+囚笼",
-      "aliases": ["囚笼+电脑"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full", "dogInCage": true},
+      "aliases": [
+        "囚笼+电脑"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "computer-full",
+        "dogInCage": true
+      },
       "effect": {
         "type": "story",
         "storyText": "将电脑给{dog}玩,{dog}陷入沉思"
@@ -652,9 +1013,18 @@
     {
       "id": "computer-cage-after",
       "keyword": "电脑+囚笼",
-      "aliases": ["囚笼+电脑"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full", "dogInCage": false},
+      "aliases": [
+        "囚笼+电脑"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "computer-full",
+        "dogInCage": false
+      },
       "effect": {
         "type": "story",
         "storyText": "将电脑关入囚笼,命名为'赛博监狱'"
@@ -663,9 +1033,18 @@
     {
       "id": "computer-vase-basic",
       "keyword": "电脑+花瓶",
-      "aliases": ["花瓶+电脑"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full", "hasItem": "vase", "passwordUnknown": true},
+      "aliases": [
+        "花瓶+电脑"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase",
+        "passwordUnknown": true
+      },
       "effect": {
         "type": "getLetterAndDamage",
         "letter": "O",
@@ -677,9 +1056,18 @@
     {
       "id": "computer-vase-password-known",
       "keyword": "电脑+花瓶",
-      "aliases": ["花瓶+电脑"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "computer-full", "hasItem": "vase", "passwordKnown": true},
+      "aliases": [
+        "花瓶+电脑"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase",
+        "passwordKnown": true
+      },
       "effect": {
         "type": "getLetterAndItem",
         "letter": "O",
@@ -690,10 +1078,18 @@
     },
     {
       "id": "key-dog",
-      "keyword": "钥匙+狗",
-      "aliases": ["钥匙+{dog}", "{dog}+钥匙", "狗+钥匙"],
-      "triggerBy": ["dog"],
-      "condition": {"hasItem": "key", "dogCanMove": true},
+      "keyword": "钥匙+dog",
+      "aliases": [
+        "钥匙+{dog}",
+        "{dog}+钥匙"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "hasItem": "key",
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "将钥匙含在嘴里(个人习惯)"
@@ -701,10 +1097,18 @@
     },
     {
       "id": "key-cat",
-      "keyword": "钥匙+猫",
-      "aliases": ["钥匙+{cat}", "{cat}+钥匙", "猫+钥匙"],
-      "triggerBy": ["cat"],
-      "condition": {"hasItem": "key", "catCanMove": true},
+      "keyword": "钥匙+cat",
+      "aliases": [
+        "钥匙+{cat}",
+        "{cat}+钥匙"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "hasItem": "key",
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "用钥匙挠后背,体感舒适"
@@ -712,10 +1116,17 @@
     },
     {
       "id": "key-turtle",
-      "keyword": "钥匙+龟",
-      "aliases": ["钥匙+{turtle}", "{turtle}+钥匙", "龟+钥匙"],
-      "triggerBy": ["turtle"],
-      "condition": {"hasItem": "key"},
+      "keyword": "钥匙+turtle",
+      "aliases": [
+        "钥匙+{turtle}",
+        "{turtle}+钥匙"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key"
+      },
       "effect": {
         "type": "story",
         "storyText": "认为钥匙用于打开'桌扇门'"
@@ -724,9 +1135,17 @@
     {
       "id": "key-monitor",
       "keyword": "钥匙+显示器",
-      "aliases": ["显示器+钥匙"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "key", "hasItem": "monitor"},
+      "aliases": [
+        "显示器+钥匙"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "destroyItem",
         "itemId": "monitor",
@@ -736,9 +1155,18 @@
     {
       "id": "key-cage-dog-inside",
       "keyword": "钥匙+囚笼",
-      "aliases": ["囚笼+钥匙"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "key", "dogInCage": true},
+      "aliases": [
+        "囚笼+钥匙"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key",
+        "dogInCage": true
+      },
       "effect": {
         "type": "unlock",
         "target": "dog",
@@ -749,9 +1177,18 @@
     {
       "id": "key-cage-after",
       "keyword": "钥匙+囚笼",
-      "aliases": ["囚笼+钥匙"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "key", "dogInCage": false},
+      "aliases": [
+        "囚笼+钥匙"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "key",
+        "dogInCage": false
+      },
       "effect": {
         "type": "story",
         "storyText": "将囚笼重新锁上"
@@ -760,9 +1197,17 @@
     {
       "id": "key-vase",
       "keyword": "钥匙+花瓶",
-      "aliases": ["花瓶+钥匙"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "key", "hasItem": "vase"},
+      "aliases": [
+        "花瓶+钥匙"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase"
+      },
       "effect": {
         "type": "story",
         "storyText": "试图用钥匙打开花瓶,被建议就医检查"
@@ -770,10 +1215,18 @@
     },
     {
       "id": "monitor-cat",
-      "keyword": "显示器+猫",
-      "aliases": ["显示器+{cat}", "{cat}+显示器", "猫+显示器"],
-      "triggerBy": ["cat"],
-      "condition": {"hasItem": "monitor", "catCanMove": true},
+      "keyword": "显示器+cat",
+      "aliases": [
+        "显示器+{cat}",
+        "{cat}+显示器"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "hasItem": "monitor",
+        "catCanMove": true
+      },
       "effect": {
         "type": "destroyItem",
         "itemId": "monitor",
@@ -782,10 +1235,18 @@
     },
     {
       "id": "monitor-dog",
-      "keyword": "显示器+狗",
-      "aliases": ["显示器+{dog}", "{dog}+显示器", "狗+显示器"],
-      "triggerBy": ["dog"],
-      "condition": {"hasItem": "monitor", "dogCanMove": true},
+      "keyword": "显示器+dog",
+      "aliases": [
+        "显示器+{dog}",
+        "{dog}+显示器"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "hasItem": "monitor",
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "发现显示器防水,性能优于当前电脑"
@@ -793,10 +1254,17 @@
     },
     {
       "id": "monitor-turtle",
-      "keyword": "显示器+龟",
-      "aliases": ["显示器+{turtle}", "{turtle}+显示器", "龟+显示器"],
-      "triggerBy": ["turtle"],
-      "condition": {"hasItem": "monitor"},
+      "keyword": "显示器+turtle",
+      "aliases": [
+        "显示器+{turtle}",
+        "{turtle}+显示器"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "heal",
         "value": 1,
@@ -806,9 +1274,17 @@
     {
       "id": "monitor-suitcase",
       "keyword": "显示器+行李箱",
-      "aliases": ["行李箱+显示器"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "monitor"},
+      "aliases": [
+        "行李箱+显示器"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "hint",
         "hintKeyword": "显示器+衣柜",
@@ -818,9 +1294,17 @@
     {
       "id": "monitor-closet-hint",
       "keyword": "显示器+衣柜",
-      "aliases": ["衣柜+显示器"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "monitor"},
+      "aliases": [
+        "衣柜+显示器"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor"
+      },
       "effect": {
         "type": "story",
         "storyText": "组合被夸'天才',触发'作者崇拜'"
@@ -829,9 +1313,18 @@
     {
       "id": "monitor-computer",
       "keyword": "显示器+电脑",
-      "aliases": ["电脑+显示器"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "monitor", "areaDiscovered": "computer"},
+      "aliases": [
+        "电脑+显示器"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "monitor",
+        "areaDiscovered": "computer"
+      },
       "effect": {
         "type": "getLetter",
         "letter": "H",
@@ -841,9 +1334,17 @@
     {
       "id": "monitor-vase",
       "keyword": "显示器+花瓶",
-      "aliases": ["花瓶+显示器"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "monitor", "hasItem": "vase"},
+      "aliases": [
+        "花瓶+显示器"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase"
+      },
       "effect": {
         "type": "hint",
         "hintKeyword": "显示器+衣柜",
@@ -852,10 +1353,18 @@
     },
     {
       "id": "vase-cat",
-      "keyword": "花瓶+猫",
-      "aliases": ["花瓶+{cat}", "{cat}+花瓶", "猫+花瓶"],
-      "triggerBy": ["cat"],
-      "condition": {"hasItem": "vase", "catCanMove": true},
+      "keyword": "花瓶+cat",
+      "aliases": [
+        "花瓶+{cat}",
+        "{cat}+花瓶"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "hasItem": "vase",
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "你把脑袋探进了花瓶当中。观察到瓶内居然有一个字母:O"
@@ -863,10 +1372,18 @@
     },
     {
       "id": "vase-dog",
-      "keyword": "花瓶+狗",
-      "aliases": ["花瓶+{dog}", "{dog}+花瓶", "狗+花瓶"],
-      "triggerBy": ["dog"],
-      "condition": {"hasItem": "vase", "dogCanMove": true},
+      "keyword": "花瓶+dog",
+      "aliases": [
+        "花瓶+{dog}",
+        "{dog}+花瓶"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "hasItem": "vase",
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{dog}标记花瓶,效果未知"
@@ -874,10 +1391,17 @@
     },
     {
       "id": "vase-turtle",
-      "keyword": "花瓶+龟",
-      "aliases": ["花瓶+{turtle}", "{turtle}+花瓶", "龟+花瓶"],
-      "triggerBy": ["turtle"],
-      "condition": {"hasItem": "vase"},
+      "keyword": "花瓶+turtle",
+      "aliases": [
+        "花瓶+{turtle}",
+        "{turtle}+花瓶"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase"
+      },
       "effect": {
         "type": "story",
         "storyText": "未发现花瓶玄机,让其他玩家尝试"
@@ -886,9 +1410,18 @@
     {
       "id": "vase-cage-dog-inside",
       "keyword": "花瓶+囚笼",
-      "aliases": ["囚笼+花瓶"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "vase", "dogInCage": true},
+      "aliases": [
+        "囚笼+花瓶"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase",
+        "dogInCage": true
+      },
       "effect": {
         "type": "destroyItem",
         "itemId": "vase",
@@ -898,9 +1431,18 @@
     {
       "id": "vase-cage-after",
       "keyword": "花瓶+囚笼",
-      "aliases": ["囚笼+花瓶"],
-      "triggerBy": ["cat", "dog", "turtle"],
-      "condition": {"hasItem": "vase", "dogInCage": false},
+      "aliases": [
+        "囚笼+花瓶"
+      ],
+      "triggerBy": [
+        "cat",
+        "dog",
+        "turtle"
+      ],
+      "condition": {
+        "hasItem": "vase",
+        "dogInCage": false
+      },
       "effect": {
         "type": "story",
         "storyText": "将花瓶关入囚笼,无效果(仅被其他玩家嘲笑)"
@@ -908,10 +1450,17 @@
     },
     {
       "id": "cat-cage-dog-inside",
-      "keyword": "猫+囚笼",
-      "aliases": ["猫+{dog}", "{cat}+囚笼", "囚笼+猫"],
-      "triggerBy": ["cat"],
-      "condition": {"dogInCage": true, "catCanMove": true},
+      "keyword": "cat+囚笼",
+      "aliases": [
+        "{cat}+囚笼"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "dogInCage": true,
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "猫嘲笑被囚的狗,被狗怒骂"
@@ -919,10 +1468,16 @@
     },
     {
       "id": "turtle-cage-dog-inside",
-      "keyword": "龟+囚笼",
-      "aliases": ["龟+{dog}", "{turtle}+囚笼", "囚笼+龟"],
-      "triggerBy": ["turtle"],
-      "condition": {"dogInCage": true},
+      "keyword": "turtle+囚笼",
+      "aliases": [
+        "{turtle}+囚笼"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{turtle}安慰{dog},称会想办法救他"
@@ -930,10 +1485,17 @@
     },
     {
       "id": "cat-cage-after",
-      "keyword": "猫+囚笼",
-      "aliases": ["{cat}+囚笼", "囚笼+猫"],
-      "triggerBy": ["cat"],
-      "condition": {"dogInCage": false, "catCanMove": true},
+      "keyword": "cat+囚笼",
+      "aliases": [
+        "{cat}+囚笼"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "dogInCage": false,
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{cat}将自己关入囚笼,称'好玩'并让其他人救自己"
@@ -941,10 +1503,16 @@
     },
     {
       "id": "turtle-cage-check",
-      "keyword": "龟+囚笼",
-      "aliases": ["{turtle}+囚笼", "囚笼+龟"],
-      "triggerBy": ["turtle"],
-      "condition": {"dogInCage": false},
+      "keyword": "turtle+囚笼",
+      "aliases": [
+        "{turtle}+囚笼"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "dogInCage": false
+      },
       "effect": {
         "type": "getItem",
         "itemId": "skip-card",
@@ -953,10 +1521,16 @@
     },
     {
       "id": "dog-cage",
-      "keyword": "狗+囚笼",
-      "aliases": ["{dog}+囚笼", "囚笼+狗"],
-      "triggerBy": ["dog"],
-      "condition": {"dogCanMove": true},
+      "keyword": "dog+囚笼",
+      "aliases": [
+        "{dog}+囚笼"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{dog}标记囚笼,效果未知"
@@ -964,10 +1538,17 @@
     },
     {
       "id": "cat-dog",
-      "keyword": "猫+狗",
-      "aliases": ["猫+{dog}", "{cat}+狗", "{cat}+{dog}", "狗+猫", "{dog}+猫"],
-      "triggerBy": ["cat"],
-      "condition": {"catCanMove": true, "dogCanMove": true},
+      "keyword": "cat+dog",
+      "aliases": [
+        "{cat}+{dog}"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "catCanMove": true,
+        "dogCanMove": true
+      },
       "effect": {
         "type": "damage",
         "target": "cat",
@@ -977,10 +1558,16 @@
     },
     {
       "id": "cat-turtle",
-      "keyword": "猫+龟",
-      "aliases": ["猫+{turtle}", "{cat}+龟", "{cat}+{turtle}", "龟+猫", "{turtle}+猫"],
-      "triggerBy": ["cat"],
-      "condition": {"catCanMove": true},
+      "keyword": "cat+turtle",
+      "aliases": [
+        "{cat}+{turtle}"
+      ],
+      "triggerBy": [
+        "cat"
+      ],
+      "condition": {
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{cat}嘲笑{turtle}'长得奇怪',{turtle}未理会"
@@ -988,10 +1575,16 @@
     },
     {
       "id": "dog-turtle",
-      "keyword": "狗+龟",
-      "aliases": ["狗+{turtle}", "{dog}+龟", "{dog}+{turtle}", "龟+狗", "{turtle}+狗"],
-      "triggerBy": ["dog"],
-      "condition": {"dogCanMove": true},
+      "keyword": "dog+turtle",
+      "aliases": [
+        "{dog}+{turtle}"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "dogCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{dog}感谢{turtle}救自己,约定共同弄清处境"
@@ -999,10 +1592,17 @@
     },
     {
       "id": "dog-cat-bond",
-      "keyword": "狗+猫",
-      "aliases": ["{dog}+猫", "{dog}+{cat}"],
-      "triggerBy": ["dog"],
-      "condition": {"dogCanMove": true, "catCanMove": true},
+      "keyword": "dog+cat",
+      "aliases": [
+        "{dog}+{cat}"
+      ],
+      "triggerBy": [
+        "dog"
+      ],
+      "condition": {
+        "dogCanMove": true,
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{dog}与{cat}互感'眼熟',认为有特殊羁绊"
@@ -1010,10 +1610,16 @@
     },
     {
       "id": "turtle-cat-urge",
-      "keyword": "龟+猫",
-      "aliases": ["{turtle}+猫", "{turtle}+{cat}"],
-      "triggerBy": ["turtle"],
-      "condition": {"catCanMove": true},
+      "keyword": "turtle+cat",
+      "aliases": [
+        "{turtle}+{cat}"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "catCanMove": true
+      },
       "effect": {
         "type": "story",
         "storyText": "{turtle}督促{cat}行动,{cat}吐槽{turtle}是'装货'"
@@ -1021,10 +1627,16 @@
     },
     {
       "id": "turtle-dog-teach",
-      "keyword": "龟+狗",
-      "aliases": ["{turtle}+狗", "{turtle}+{dog}"],
-      "triggerBy": ["turtle"],
-      "condition": {"dogCanMove": true},
+      "keyword": "turtle+dog",
+      "aliases": [
+        "{turtle}+{dog}"
+      ],
+      "triggerBy": [
+        "turtle"
+      ],
+      "condition": {
+        "dogCanMove": true
+      },
       "effect": {
         "type": "heal",
         "target": "dog",
@@ -1033,12 +1645,16 @@
       }
     }
   ],
-
   "winCondition": {
     "type": "password",
     "password": "ECHO",
     "door": "big-door",
-    "requiredLetters": ["C", "H", "E", "O"],
+    "requiredLetters": [
+      "C",
+      "H",
+      "E",
+      "O"
+    ],
     "description": "输入四位密码'ECHO'(由之前获得的字母C、E、O、H组合)可打开大门",
     "successText": "凭智慧打开密室大门,完成第一关"
   }

@@ -12,24 +12,24 @@ let sceneData = {};
 const CHARACTERS = {
     cat: {
         id: 'cat',
-        name: '猫',
-        icon: '🐱',
+        name: '角色A',
+        icon: '❓',
         maxHp: 8,
-        description: '猫咪，灵活敏捷但怕水'
+        description: '灵活敏捷但怕水'
     },
     dog: {
         id: 'dog',
-        name: '狗',
-        icon: '🐶',
+        name: '角色B',
+        icon: '❓',
         maxHp: 8,
-        description: '狗狗，力量强大且忠诚'
+        description: '力量强大且忠诚'
     },
     turtle: {
         id: 'turtle',
-        name: '龟',
-        icon: '🐢',
+        name: '角色C',
+        icon: '❓',
         maxHp: 8,
-        description: '乌龟，防御力高且擅长游泳'
+        description: '防御高擅长游泳'
     }
 };
 
