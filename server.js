@@ -275,6 +275,7 @@ function applyEffect(effect, gameState, players, roomId, io, currentPlayerId = n
       }
       break;
 
+    case 'unlock':
     case 'unlockAndRescue':
       if (effect.target === 'cat') {
         gameState.catCanMove = true;
@@ -599,8 +600,29 @@ io.on('connection', (socket) => {
     let matchedInteraction = null;
 
     for (const interaction of sceneData.interactions) {
-      const keywords = [interaction.keyword, ...(interaction.aliases || [])];
-      const match = keywords.some(kw => kw.toLowerCase() === normalizedKeyword);
+      // 处理基础关键词和别名
+      let keywords = [interaction.keyword, ...(interaction.aliases || [])];
+
+      // 展开别名中的占位符（{cat}、{dog}、{turtle}）
+      const expandedKeywords = [];
+      keywords.forEach(kw => {
+        expandedKeywords.push(kw);
+
+        // 替换占位符为角色ID和玩家名
+        Object.values(room.players).forEach(player => {
+          const role = player.character.id;
+          const name = player.name;
+
+          // {cat} -> cat 或玩家名
+          const placeholder = `{${role}}`;
+          if (kw.includes(placeholder)) {
+            expandedKeywords.push(kw.replace(placeholder, role));
+            expandedKeywords.push(kw.replace(placeholder, name));
+          }
+        });
+      });
+
+      const match = expandedKeywords.some(kw => kw.toLowerCase() === normalizedKeyword);
 
       if (match && !room.gameState.usedInteractions.includes(interaction.keyword)) {
         // 移除角色限制 - 所有可行动的玩家都可以执行任何关键词
@@ -691,65 +713,6 @@ io.on('connection', (socket) => {
       socket.emit('doorResult', {
         success: false,
         message: '密码错误！请检查你收集的字母。'
-      });
-    }
-  });
-
-  // 尝试解锁行李箱
-  socket.on('trySuitcaseUnlock', (data) => {
-    const { roomId, playerId, password } = data;
-
-    if (!rooms[roomId]) {
-      socket.emit('error', { message: '房间不存在' });
-      return;
-    }
-
-    const room = rooms[roomId];
-    const suitcaseArea = sceneData.areas['suitcase'];
-
-    if (!suitcaseArea) {
-      socket.emit('error', { message: '行李箱不存在' });
-      return;
-    }
-
-    // 检查密码是否正确
-    if (password === suitcaseArea.password) {
-      // 标记行李箱为已解锁
-      suitcaseArea.locked = false;
-
-      // 解锁猫角色的行动能力
-      const catPlayer = Object.values(room.players).find(p => p.character.id === 'cat');
-      if (catPlayer) {
-        catPlayer.canMove = true;
-
-        // 更新游戏状态
-        room.gameState.catCanMove = true;
-
-        // 发送成功消息给所有玩家
-        io.to(roomId).emit('suitcaseUnlocked', {
-          success: true,
-          message: `行李箱被成功解锁！${catPlayer.name}（猫）获得了行动能力！`,
-          gameState: room.gameState,
-          players: room.players
-        });
-
-        console.log(`房间 ${roomId} - 行李箱已解锁，猫角色恢复行动`);
-      } else {
-        // 即使没有猫角色也解锁行李箱
-        io.to(roomId).emit('suitcaseUnlocked', {
-          success: true,
-          message: '行李箱被成功解锁！',
-          gameState: room.gameState,
-          players: room.players
-        });
-
-        console.log(`房间 ${roomId} - 行李箱已解锁`);
-      }
-    } else {
-      // 密码错误
-      socket.emit('suitcaseUnlocked', {
-        success: false,
-        message: '密码错误！请重新尝试。'
       });
     }
   });

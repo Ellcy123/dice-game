@@ -116,24 +116,6 @@ function initSocket() {
         }
     });
 
-    socket.on('suitcaseUnlocked', (data) => {
-        if (data.success) {
-            // 更新游戏状态
-            gameState = data.gameState;
-            players = data.players;
-
-            // 显示解锁消息
-            addStoryEntry('系统', data.message);
-
-            // 隐藏密码输入框
-            document.getElementById('suitcaseUnlockSection').style.display = 'none';
-
-            // 更新UI
-            updateUI();
-        } else {
-            addStoryEntry('系统', data.message);
-        }
-    });
 
     socket.on('playerLeft', (data) => {
         players = data.players;
@@ -487,21 +469,11 @@ function updateInventory() {
 // 更新大门区域
 function updateDoorSection() {
     const doorSection = document.getElementById('doorUnlockSection');
-    const suitcaseSection = document.getElementById('suitcaseUnlockSection');
     const discoveredAreas = gameState.discoveredAreas || [];
 
     // 当发现大门时显示密码输入
     if (discoveredAreas.includes('big-door')) {
         doorSection.style.display = 'block';
-    }
-
-    // 当发现行李箱且未解锁时显示密码输入
-    const areas = sceneData.areas || {};
-    const suitcaseArea = areas['suitcase'];
-    if (discoveredAreas.includes('suitcase') && suitcaseArea && suitcaseArea.locked) {
-        suitcaseSection.style.display = 'block';
-    } else if (suitcaseSection) {
-        suitcaseSection.style.display = 'none';
     }
 }
 
@@ -562,21 +534,6 @@ function tryOpenDoor() {
     });
 }
 
-// 尝试解锁行李箱
-function trySuitcaseUnlock() {
-    const password = document.getElementById('suitcasePassword').value.trim();
-
-    if (!password) {
-        alert('请输入密码！');
-        return;
-    }
-
-    socket.emit('trySuitcaseUnlock', {
-        roomId: roomId,
-        playerId: myId,
-        password: password
-    });
-}
 
 // 显示胜利界面
 function showVictory(message) {
