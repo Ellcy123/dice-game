@@ -343,7 +343,7 @@
       "effect": {
         "type": "unlock",
         "target": "cat",
-        "storyText": "行李箱带三位初始密码(000,玩家无法获取),主持人解锁后可救出猫,猫恢复行动",
+        "storyText": "行李箱带三位初始密码(000,玩家无法获取),主持人解锁后可救出{cat},{cat}恢复行动",
         "unlockCharacter": "cat"
       }
     },
@@ -551,7 +551,7 @@
       "effect": {
         "type": "discoverArea",
         "newAreaId": "hidden-room",
-        "storyText": "龟在衣柜下方发现了一个按钮,按下去后衣柜打开了。后面居然有一个小房间。小房间：房间内有一个巨大的囚笼,狗被困在其中,房间内还有一个花瓶和一个电脑。墙上有一扇只可以用四位密码触发打开的大门",
+        "storyText": "{turtle}在衣柜下方发现了一个按钮,按下去后衣柜打开了。后面居然有一个小房间。小房间：房间内有一个巨大的囚笼,{dog}被困在其中,房间内还有一个花瓶和一个电脑。墙上有一扇只可以用四位密码触发打开的大门",
         "unlockItems": [
           "vase",
           "computer",
@@ -576,7 +576,7 @@
       "effect": {
         "type": "getLetter",
         "letter": "C",
-        "storyText": "猫在衣柜上面发现了一个模模糊糊的字母：C"
+        "storyText": "{cat}在衣柜上面发现了一个模模糊糊的字母：C"
       }
     },
     {
@@ -1463,7 +1463,7 @@
       },
       "effect": {
         "type": "story",
-        "storyText": "猫嘲笑被囚的狗,被狗怒骂"
+        "storyText": "{cat}嘲笑被囚的{dog},被{dog}怒骂"
       }
     },
     {
