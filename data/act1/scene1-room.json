@@ -1657,5 +1657,27 @@
     ],
     "description": "输入四位密码'ECHO'(由之前获得的字母C、E、O、H组合)可打开大门",
     "successText": "凭智慧打开密室大门,完成第一关"
+  },
+  "items": {
+    "wooden-box": {
+      "id": "wooden-box",
+      "name": "木盒",
+      "description": "龟从水潭获得的神秘木盒"
+    },
+    "key": {
+      "id": "key",
+      "name": "钥匙",
+      "description": "从行李箱中获得的古老钥匙"
+    },
+    "monitor": {
+      "id": "monitor",
+      "name": "显示器",
+      "description": "从水潭中捞起的损坏显示器"
+    },
+    "computer-full": {
+      "id": "computer-full",
+      "name": "电脑",
+      "description": "小房间内的电脑"
+    }
   }
 }
