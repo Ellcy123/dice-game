@@ -276,6 +276,11 @@ function applyEffect(effect, gameState, players, roomId, io, currentPlayerId = n
       break;
 
     case 'unlock':
+      // 需要密码验证的解锁，不直接解锁，而是发送请求
+      results.requiresPassword = true;
+      results.passwordType = effect.target || 'cat';
+      break;
+
     case 'unlockAndRescue':
       if (effect.target === 'cat') {
         gameState.catCanMove = true;
@@ -689,6 +694,16 @@ io.on('connection', (socket) => {
       if (p.character.id === 'turtle') p.canMove = room.gameState.turtleCanMove;
     });
 
+    // 如果需要密码验证，发送密码请求
+    if (result.requiresPassword) {
+      io.to(roomId).emit('requestSuitcasePassword', {
+        message: result.storyText,
+        passwordType: result.passwordType
+      });
+      console.log(`房间 ${roomId} - ${player.name} 触发行李箱解锁，请求密码验证`);
+      return;
+    }
+
     // 广播结果给所有玩家
     io.to(roomId).emit('keywordResult', {
       success: true,
@@ -728,6 +743,46 @@ io.on('connection', (socket) => {
       socket.emit('doorResult', {
         success: false,
         message: '密码错误！请检查你收集的字母。'
+      });
+    }
+  });
+
+  // 确认行李箱解锁（主持人输入密码）
+  socket.on('confirmSuitcaseUnlock', (data) => {
+    const { roomId, playerId, password } = data;
+
+    if (!rooms[roomId]) {
+      socket.emit('error', { message: '房间不存在' });
+      return;
+    }
+
+    const room = rooms[roomId];
+    const correctPassword = '000';
+
+    if (password === correctPassword) {
+      // 密码正确，解锁行李箱并启用猫的行动能力
+      room.gameState.suitcaseUnlocked = true;
+
+      // 找到猫角色玩家并启用其行动能力
+      const catPlayer = Object.values(room.players).find(p => p.character && p.character.id === 'cat');
+      if (catPlayer) {
+        catPlayer.canMove = true;
+      }
+
+      // 广播解锁成功事件
+      io.to(roomId).emit('suitcaseUnlocked', {
+        success: true,
+        message: `行李箱已解锁！${catPlayer ? catPlayer.name : '猫'}恢复行动`,
+        gameState: room.gameState,
+        players: room.players
+      });
+
+      console.log(`房间 ${roomId} - 行李箱已解锁，${catPlayer ? catPlayer.name : '猫'}恢复行动`);
+    } else {
+      // 密码错误，只发送给请求者
+      socket.emit('suitcaseUnlocked', {
+        success: false,
+        message: '密码错误！'
       });
     }
   });

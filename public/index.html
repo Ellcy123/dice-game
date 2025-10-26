@@ -714,6 +714,28 @@
         </div>
     </div>
 
+    <!-- 行李箱密码验证弹窗 -->
+    <div id="suitcasePasswordModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: rgba(30, 20, 10, 0.95); border: 3px solid #8b6914; border-radius: 10px; padding: 40px; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(139, 105, 20, 0.5);">
+            <h2 style="color: #f4d03f; margin-bottom: 20px;">🧳 行李箱解锁</h2>
+            <p style="color: #aaa; margin-bottom: 20px; font-size: 14px;">行李箱需要三位数字密码才能解锁</p>
+            <input
+                type="text"
+                id="suitcaseModalPassword"
+                placeholder="输入密码"
+                maxlength="3"
+                inputmode="numeric"
+                style="width: 100%; padding: 12px; background: rgba(20, 20, 20, 0.8); border: 2px solid #666; border-radius: 5px; color: #fff; font-size: 20px; text-align: center; letter-spacing: 8px; margin-bottom: 20px; font-family: 'Courier New', monospace;"
+                onkeypress="if(event.key==='Enter') verifySuitcasePassword()"
+            >
+            <div style="display: flex; gap: 10px;">
+                <button onclick="verifySuitcasePassword()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #8b6914 0%, #6b5010 100%); border: 2px solid #f4d03f; border-radius: 5px; color: #fff; cursor: pointer; font-weight: bold;">确认</button>
+                <button onclick="closeSuitcaseModal()" style="flex: 1; padding: 12px; background: rgba(100, 100, 100, 0.8); border: 2px solid #666; border-radius: 5px; color: #fff; cursor: pointer; font-weight: bold;">取消</button>
+            </div>
+            <div id="suitcaseErrorMsg" style="color: #e74c3c; margin-top: 15px; font-size: 12px; display: none;"></div>
+        </div>
+    </div>
+
     <!-- 胜利界面 -->
     <div id="victoryBanner" style="display: none;" class="victory-banner">
         <h2>🎉 恭喜通关！</h2>

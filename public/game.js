@@ -104,6 +104,31 @@ function initSocket() {
         document.getElementById('keywordInput').value = '';
     });
 
+    // 监听行李箱解锁请求
+    socket.on('requestSuitcasePassword', (data) => {
+        // 显示密码输入弹窗
+        showSuitcasePasswordModal();
+        // 显示提示消息
+        addStoryEntry('系统', data.message || '请输入行李箱密码以解锁并救出猫');
+    });
+
+    // 监听行李箱解锁结果
+    socket.on('suitcaseUnlocked', (data) => {
+        if (data.success) {
+            gameState = data.gameState;
+            players = data.players;
+            addStoryEntry('系统', data.message);
+            updateUI();
+        } else {
+            // 密码错误，重新显示弹窗
+            const errorMsg = document.getElementById('suitcaseErrorMsg');
+            errorMsg.textContent = data.message;
+            errorMsg.style.display = 'block';
+            document.getElementById('suitcaseModalPassword').value = '';
+            showSuitcasePasswordModal();
+        }
+    });
+
     socket.on('gameCompleted', (data) => {
         if (data.success) {
             showVictory(data.message);
@@ -556,6 +581,47 @@ function copyRoomId() {
     }).catch(() => {
         prompt('复制这个房间ID分享给朋友:', roomId);
     });
+}
+
+// 显示行李箱密码弹窗
+function showSuitcasePasswordModal() {
+    document.getElementById('suitcasePasswordModal').style.display = 'flex';
+    document.getElementById('suitcaseModalPassword').value = '';
+    document.getElementById('suitcaseErrorMsg').style.display = 'none';
+    document.getElementById('suitcaseModalPassword').focus();
+}
+
+// 关闭行李箱密码弹窗
+function closeSuitcaseModal() {
+    document.getElementById('suitcasePasswordModal').style.display = 'none';
+}
+
+// 验证行李箱密码
+function verifySuitcasePassword() {
+    const password = document.getElementById('suitcaseModalPassword').value.trim();
+    const correctPassword = '000';
+    const errorMsg = document.getElementById('suitcaseErrorMsg');
+
+    if (!password) {
+        errorMsg.textContent = '请输入密码';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    if (password === correctPassword) {
+        // 密码正确，发送确认事件到服务器
+        socket.emit('confirmSuitcaseUnlock', {
+            roomId: roomId,
+            playerId: myId,
+            password: password
+        });
+        closeSuitcaseModal();
+    } else {
+        // 密码错误
+        errorMsg.textContent = '密码错误！';
+        errorMsg.style.display = 'block';
+        document.getElementById('suitcaseModalPassword').value = '';
+    }
 }
 
 // 退出登录
