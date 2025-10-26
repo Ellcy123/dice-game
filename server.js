@@ -522,8 +522,8 @@ io.on('connection', (socket) => {
     }
 
     const playerCount = Object.keys(rooms[roomId].players).length;
-    if (playerCount < 3) {
-      socket.emit('error', { message: '需要3名玩家才能开始游戏' });
+    if (playerCount < 1) {
+      socket.emit('error', { message: '至少需要1名玩家才能开始游戏' });
       return;
     }
 
@@ -531,10 +531,11 @@ io.on('connection', (socket) => {
 
     io.to(roomId).emit('gameStarted', {
       gameState: rooms[roomId].gameState,
-      message: sceneData.description
+      message: sceneData.description,
+      playerCount: playerCount
     });
 
-    console.log(`房间 ${roomId} 游戏开始`);
+    console.log(`房间 ${roomId} 游戏开始 (${playerCount}名玩家)`);
   });
 
   // 处理关键词输入

@@ -320,12 +320,9 @@ function updateWaitingScreen() {
 
     // 显示/隐藏开始按钮
     const startBtn = document.getElementById('startGameBtn');
-    if (playerCount === 3) {
-        // 只有房主能看到开始按钮
-        const playersList = Object.values(players);
-        if (playersList[0].id === myId) {
-            startBtn.style.display = 'block';
-        }
+    // 任何玩家在任何人数（1-3人）下都可以开始游戏
+    if (playerCount >= 1) {
+        startBtn.style.display = 'block';
     } else {
         startBtn.style.display = 'none';
     }
