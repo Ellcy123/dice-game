@@ -191,8 +191,35 @@ function canPlayerTrigger(interaction, playerRole) {
   return interaction.triggerBy.includes(roleMap[playerRole]);
 }
 
+// 替换故事文本中的玩家名字占位符
+function replacePlayerNames(text, players, currentPlayerId = null) {
+  if (!text) return text;
+
+  let result = text;
+
+  // 获取各角色的玩家名字
+  const playerNames = {};
+  Object.values(players).forEach(player => {
+    if (player.character && player.character.id) {
+      playerNames[player.character.id] = player.name;
+    }
+  });
+
+  // 替换角色占位符
+  result = result.replace(/\{cat\}/g, playerNames.cat || '猫');
+  result = result.replace(/\{dog\}/g, playerNames.dog || '狗');
+  result = result.replace(/\{turtle\}/g, playerNames.turtle || '龟');
+
+  // 替换当前玩家占位符
+  if (currentPlayerId && players[currentPlayerId]) {
+    result = result.replace(/\{current\}/g, players[currentPlayerId].name);
+  }
+
+  return result;
+}
+
 // 处理交互效果
-function applyEffect(effect, gameState, players, roomId, io) {
+function applyEffect(effect, gameState, players, roomId, io, currentPlayerId = null) {
   const results = {
     success: true,
     storyText: effect.storyText,
@@ -281,10 +308,13 @@ function applyEffect(effect, gameState, players, roomId, io) {
     });
   }
 
+  // 替换故事文本中的玩家名字占位符
+  results.storyText = replacePlayerNames(results.storyText, players, currentPlayerId);
+
   // 添加到故事日志
   gameState.storyLog.push({
     timestamp: Date.now(),
-    text: effect.storyText,
+    text: results.storyText,
     type: effect.type
   });
 
@@ -578,7 +608,8 @@ io.on('connection', (socket) => {
       room.gameState,
       room.players,
       roomId,
-      io
+      io,
+      playerId
     );
 
     // 标记该交互已使用（除非可重复使用）

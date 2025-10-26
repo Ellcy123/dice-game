@@ -6,21 +6,21 @@
   "characters": {
     "cat": {
       "id": "cat",
-      "name": "天一",
+      "name": "猫",
       "icon": "🐱",
       "maxHp": 8,
       "description": "猫咪,灵活敏捷但怕水"
     },
     "dog": {
       "id": "dog",
-      "name": "二水",
+      "name": "狗",
       "icon": "🐶",
       "maxHp": 8,
       "description": "狗狗,力量强大且忠诚"
     },
     "turtle": {
       "id": "turtle",
-      "name": "包子",
+      "name": "龟",
       "icon": "🐢",
       "maxHp": 8,
       "description": "乌龟,防御力高且擅长游泳"
@@ -68,7 +68,7 @@
     "cage": {
       "areaId": "cage",
       "name": "囚笼",
-      "description": "小房间内的巨大囚笼,二水被困在其中。",
+      "description": "小房间内的巨大囚笼,{dog}被困在其中。",
       "visible": false,
       "locked": true
     },
@@ -98,32 +98,32 @@
     {
       "id": "water-turtle",
       "keyword": "水潭+龟",
-      "aliases": ["水潭+包子", "包子+水潭", "龟+水潭"],
+      "aliases": ["水潭+{turtle}", "{turtle}+水潭", "龟+水潭"],
       "triggerBy": ["turtle"],
       "condition": null,
       "effect": {
         "type": "getItem",
         "itemId": "wooden-box",
-        "storyText": "包子潜入水中获得木盒,水下另有物品但无法拿取"
+        "storyText": "{turtle}潜入水中获得木盒,水下另有物品但无法拿取"
       }
     },
     {
       "id": "water-cat",
       "keyword": "水潭+猫",
-      "aliases": ["水潭+天一", "天一+水潭", "猫+水潭"],
+      "aliases": ["水潭+{cat}", "{cat}+水潭", "猫+水潭"],
       "triggerBy": ["cat"],
       "condition": {"catCanMove": true},
       "effect": {
         "type": "damage",
         "target": "cat",
         "value": -1,
-        "storyText": "天一跳入水中(不会游泳),因'要面子'未呼救,生命值-1"
+        "storyText": "{cat}跳入水中(不会游泳),因'要面子'未呼救,生命值-1"
       }
     },
     {
       "id": "water-dog",
       "keyword": "水潭+狗",
-      "aliases": ["水潭+二水", "二水+水潭", "狗+水潭"],
+      "aliases": ["水潭+{dog}", "{dog}+水潭", "狗+水潭"],
       "triggerBy": ["dog"],
       "condition": {"dogCanMove": true},
       "effect": {
@@ -201,7 +201,7 @@
         "type": "damage",
         "target": "current",
         "value": -2,
-        "storyText": "试图浸囚笼,被二水咬伤,生命值-2"
+        "storyText": "试图浸囚笼,被{dog}咬伤,生命值-2"
       }
     },
     {
@@ -245,7 +245,7 @@
     {
       "id": "suitcase-turtle",
       "keyword": "行李箱+龟",
-      "aliases": ["行李箱+包子", "包子+行李箱", "龟+行李箱"],
+      "aliases": ["行李箱+{turtle}", "{turtle}+行李箱", "龟+行李箱"],
       "triggerBy": ["turtle"],
       "condition": null,
       "effect": {
@@ -258,24 +258,24 @@
     {
       "id": "suitcase-cat",
       "keyword": "行李箱+猫",
-      "aliases": ["行李箱+天一", "天一+行李箱", "猫+行李箱"],
+      "aliases": ["行李箱+{cat}", "{cat}+行李箱", "猫+行李箱"],
       "triggerBy": ["cat"],
       "condition": {"catCanMove": true},
       "effect": {
         "type": "getItem",
         "itemId": "key",
-        "storyText": "天一撕烂行李箱,获得内钥匙"
+        "storyText": "{cat}撕烂行李箱,获得内钥匙"
       }
     },
     {
       "id": "suitcase-dog",
       "keyword": "行李箱+狗",
-      "aliases": ["行李箱+二水", "二水+行李箱", "狗+行李箱"],
+      "aliases": ["行李箱+{dog}", "{dog}+行李箱", "狗+行李箱"],
       "triggerBy": ["dog"],
       "condition": {"dogCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "二水标记行李箱,效果未知"
+        "storyText": "{dog}标记行李箱,效果未知"
       }
     },
     {
@@ -322,7 +322,7 @@
         "type": "damage",
         "target": "dog",
         "value": -1,
-        "storyText": "用行李箱砸囚笼救二水,不慎砸伤二水,二水生命值-1"
+        "storyText": "用行李箱砸囚笼救{dog},不慎砸伤{dog},{dog}生命值-1"
       }
     },
     {
@@ -372,7 +372,7 @@
     {
       "id": "closet-turtle",
       "keyword": "衣柜+龟",
-      "aliases": ["衣柜+包子", "包子+衣柜", "龟+衣柜"],
+      "aliases": ["衣柜+{turtle}", "{turtle}+衣柜", "龟+衣柜"],
       "triggerBy": ["turtle"],
       "condition": null,
       "effect": {
@@ -385,7 +385,7 @@
     {
       "id": "closet-cat",
       "keyword": "衣柜+猫",
-      "aliases": ["衣柜+天一", "天一+衣柜", "猫+衣柜"],
+      "aliases": ["衣柜+{cat}", "{cat}+衣柜", "猫+衣柜"],
       "triggerBy": ["cat"],
       "condition": {"catCanMove": true},
       "effect": {
@@ -397,12 +397,12 @@
     {
       "id": "closet-dog",
       "keyword": "衣柜+狗",
-      "aliases": ["衣柜+二水", "二水+衣柜", "狗+衣柜"],
+      "aliases": ["衣柜+{dog}", "{dog}+衣柜", "狗+衣柜"],
       "triggerBy": ["dog"],
       "condition": {"dogCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "二水标记衣柜,效果未知"
+        "storyText": "{dog}标记衣柜,效果未知"
       }
     },
     {
@@ -452,7 +452,7 @@
         "type": "damage",
         "target": "current",
         "value": -2,
-        "storyText": "将囚笼锁入衣柜,被二水咬伤,生命值-2"
+        "storyText": "将囚笼锁入衣柜,被{dog}咬伤,生命值-2"
       }
     },
     {
@@ -463,7 +463,7 @@
       "condition": {"dogInCage": false},
       "effect": {
         "type": "story",
-        "storyText": "给囚笼内的二水穿衣服(不合身),被其他玩家疏远"
+        "storyText": "给囚笼内的{dog}穿衣服(不合身),被其他玩家疏远"
       }
     },
     {
@@ -493,35 +493,35 @@
     {
       "id": "wooden-box-turtle",
       "keyword": "木盒+龟",
-      "aliases": ["木盒+包子", "包子+木盒", "龟+木盒"],
+      "aliases": ["木盒+{turtle}", "{turtle}+木盒", "龟+木盒"],
       "triggerBy": ["turtle"],
       "condition": {"hasItem": "wooden-box"},
       "effect": {
         "type": "story",
-        "storyText": "包子无法打开木盒"
+        "storyText": "{turtle}无法打开木盒"
       }
     },
     {
       "id": "wooden-box-cat",
       "keyword": "木盒+猫",
-      "aliases": ["木盒+天一", "天一+木盒", "猫+木盒"],
+      "aliases": ["木盒+{cat}", "{cat}+木盒", "猫+木盒"],
       "triggerBy": ["cat"],
       "condition": {"hasItem": "wooden-box", "catCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "天一无法打开木盒"
+        "storyText": "{cat}无法打开木盒"
       }
     },
     {
       "id": "wooden-box-dog",
       "keyword": "木盒+狗",
-      "aliases": ["木盒+二水", "二水+木盒", "狗+木盒"],
+      "aliases": ["木盒+{dog}", "{dog}+木盒", "狗+木盒"],
       "triggerBy": ["dog"],
       "condition": {"hasItem": "wooden-box", "dogCanMove": true},
       "effect": {
         "type": "getLetter",
         "letter": "E",
-        "storyText": "二水咬开木盒,获得字条'E'"
+        "storyText": "{dog}咬开木盒,获得字条'E'"
       }
     },
     {
@@ -567,7 +567,7 @@
       "effect": {
         "type": "getLetter",
         "letter": "E",
-        "storyText": "将木盒给二水,二水咬开后获得字条'E'"
+        "storyText": "将木盒给{dog},{dog}咬开后获得字条'E'"
       }
     },
     {
@@ -597,34 +597,34 @@
     {
       "id": "computer-cat",
       "keyword": "电脑+猫",
-      "aliases": ["电脑+天一", "天一+电脑", "猫+电脑"],
+      "aliases": ["电脑+{cat}", "{cat}+电脑", "猫+电脑"],
       "triggerBy": ["cat"],
       "condition": {"hasItem": "computer-full", "catCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "天一发现电脑损坏,无法维修"
+        "storyText": "{cat}发现电脑损坏,无法维修"
       }
     },
     {
       "id": "computer-turtle",
       "keyword": "电脑+龟",
-      "aliases": ["电脑+包子", "包子+电脑", "龟+电脑"],
+      "aliases": ["电脑+{turtle}", "{turtle}+电脑", "龟+电脑"],
       "triggerBy": ["turtle"],
       "condition": {"hasItem": "computer-full"},
       "effect": {
         "type": "story",
-        "storyText": "包子发现电脑损坏,无法维修"
+        "storyText": "{turtle}发现电脑损坏,无法维修"
       }
     },
     {
       "id": "computer-dog",
       "keyword": "电脑+狗",
-      "aliases": ["电脑+二水", "二水+电脑", "狗+电脑"],
+      "aliases": ["电脑+{dog}", "{dog}+电脑", "狗+电脑"],
       "triggerBy": ["dog"],
       "condition": {"hasItem": "computer-full", "dogCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "二水标记电脑,效果未知"
+        "storyText": "{dog}标记电脑,效果未知"
       }
     },
     {
@@ -646,7 +646,7 @@
       "condition": {"hasItem": "computer-full", "dogInCage": true},
       "effect": {
         "type": "story",
-        "storyText": "将电脑给二水玩,二水陷入沉思"
+        "storyText": "将电脑给{dog}玩,{dog}陷入沉思"
       }
     },
     {
@@ -691,7 +691,7 @@
     {
       "id": "key-dog",
       "keyword": "钥匙+狗",
-      "aliases": ["钥匙+二水", "二水+钥匙", "狗+钥匙"],
+      "aliases": ["钥匙+{dog}", "{dog}+钥匙", "狗+钥匙"],
       "triggerBy": ["dog"],
       "condition": {"hasItem": "key", "dogCanMove": true},
       "effect": {
@@ -702,7 +702,7 @@
     {
       "id": "key-cat",
       "keyword": "钥匙+猫",
-      "aliases": ["钥匙+天一", "天一+钥匙", "猫+钥匙"],
+      "aliases": ["钥匙+{cat}", "{cat}+钥匙", "猫+钥匙"],
       "triggerBy": ["cat"],
       "condition": {"hasItem": "key", "catCanMove": true},
       "effect": {
@@ -713,7 +713,7 @@
     {
       "id": "key-turtle",
       "keyword": "钥匙+龟",
-      "aliases": ["钥匙+包子", "包子+钥匙", "龟+钥匙"],
+      "aliases": ["钥匙+{turtle}", "{turtle}+钥匙", "龟+钥匙"],
       "triggerBy": ["turtle"],
       "condition": {"hasItem": "key"},
       "effect": {
@@ -743,7 +743,7 @@
         "type": "unlock",
         "target": "dog",
         "unlockCharacter": "dog",
-        "storyText": "打开囚笼,二水恢复行动"
+        "storyText": "打开囚笼,{dog}恢复行动"
       }
     },
     {
@@ -771,19 +771,19 @@
     {
       "id": "monitor-cat",
       "keyword": "显示器+猫",
-      "aliases": ["显示器+天一", "天一+显示器", "猫+显示器"],
+      "aliases": ["显示器+{cat}", "{cat}+显示器", "猫+显示器"],
       "triggerBy": ["cat"],
       "condition": {"hasItem": "monitor", "catCanMove": true},
       "effect": {
         "type": "destroyItem",
         "itemId": "monitor",
-        "storyText": "天一砸坏显示器,显示器消失(备注：显示器无法使用,密码需'瞎猜')"
+        "storyText": "{cat}砸坏显示器,显示器消失(备注：显示器无法使用,密码需'瞎猜')"
       }
     },
     {
       "id": "monitor-dog",
       "keyword": "显示器+狗",
-      "aliases": ["显示器+二水", "二水+显示器", "狗+显示器"],
+      "aliases": ["显示器+{dog}", "{dog}+显示器", "狗+显示器"],
       "triggerBy": ["dog"],
       "condition": {"hasItem": "monitor", "dogCanMove": true},
       "effect": {
@@ -794,7 +794,7 @@
     {
       "id": "monitor-turtle",
       "keyword": "显示器+龟",
-      "aliases": ["显示器+包子", "包子+显示器", "龟+显示器"],
+      "aliases": ["显示器+{turtle}", "{turtle}+显示器", "龟+显示器"],
       "triggerBy": ["turtle"],
       "condition": {"hasItem": "monitor"},
       "effect": {
@@ -853,7 +853,7 @@
     {
       "id": "vase-cat",
       "keyword": "花瓶+猫",
-      "aliases": ["花瓶+天一", "天一+花瓶", "猫+花瓶"],
+      "aliases": ["花瓶+{cat}", "{cat}+花瓶", "猫+花瓶"],
       "triggerBy": ["cat"],
       "condition": {"hasItem": "vase", "catCanMove": true},
       "effect": {
@@ -864,18 +864,18 @@
     {
       "id": "vase-dog",
       "keyword": "花瓶+狗",
-      "aliases": ["花瓶+二水", "二水+花瓶", "狗+花瓶"],
+      "aliases": ["花瓶+{dog}", "{dog}+花瓶", "狗+花瓶"],
       "triggerBy": ["dog"],
       "condition": {"hasItem": "vase", "dogCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "二水标记花瓶,效果未知"
+        "storyText": "{dog}标记花瓶,效果未知"
       }
     },
     {
       "id": "vase-turtle",
       "keyword": "花瓶+龟",
-      "aliases": ["花瓶+包子", "包子+花瓶", "龟+花瓶"],
+      "aliases": ["花瓶+{turtle}", "{turtle}+花瓶", "龟+花瓶"],
       "triggerBy": ["turtle"],
       "condition": {"hasItem": "vase"},
       "effect": {
@@ -892,7 +892,7 @@
       "effect": {
         "type": "destroyItem",
         "itemId": "vase",
-        "storyText": "将花瓶递给二水,二水将其弄坏"
+        "storyText": "将花瓶递给{dog},{dog}将其弄坏"
       }
     },
     {
@@ -909,7 +909,7 @@
     {
       "id": "cat-cage-dog-inside",
       "keyword": "猫+囚笼",
-      "aliases": ["猫+二水", "天一+囚笼", "囚笼+猫"],
+      "aliases": ["猫+{dog}", "{cat}+囚笼", "囚笼+猫"],
       "triggerBy": ["cat"],
       "condition": {"dogInCage": true, "catCanMove": true},
       "effect": {
@@ -920,116 +920,116 @@
     {
       "id": "turtle-cage-dog-inside",
       "keyword": "龟+囚笼",
-      "aliases": ["龟+二水", "包子+囚笼", "囚笼+龟"],
+      "aliases": ["龟+{dog}", "{turtle}+囚笼", "囚笼+龟"],
       "triggerBy": ["turtle"],
       "condition": {"dogInCage": true},
       "effect": {
         "type": "story",
-        "storyText": "包子安慰二水,称会想办法救他"
+        "storyText": "{turtle}安慰{dog},称会想办法救他"
       }
     },
     {
       "id": "cat-cage-after",
       "keyword": "猫+囚笼",
-      "aliases": ["天一+囚笼", "囚笼+猫"],
+      "aliases": ["{cat}+囚笼", "囚笼+猫"],
       "triggerBy": ["cat"],
       "condition": {"dogInCage": false, "catCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "天一将自己关入囚笼,称'好玩'并让其他人救自己"
+        "storyText": "{cat}将自己关入囚笼,称'好玩'并让其他人救自己"
       }
     },
     {
       "id": "turtle-cage-check",
       "keyword": "龟+囚笼",
-      "aliases": ["包子+囚笼", "囚笼+龟"],
+      "aliases": ["{turtle}+囚笼", "囚笼+龟"],
       "triggerBy": ["turtle"],
       "condition": {"dogInCage": false},
       "effect": {
         "type": "getItem",
         "itemId": "skip-card",
-        "storyText": "包子检查囚笼下方,获得跳关卡卡(最后关卡可用)"
+        "storyText": "{turtle}检查囚笼下方,获得跳关卡卡(最后关卡可用)"
       }
     },
     {
       "id": "dog-cage",
       "keyword": "狗+囚笼",
-      "aliases": ["二水+囚笼", "囚笼+狗"],
+      "aliases": ["{dog}+囚笼", "囚笼+狗"],
       "triggerBy": ["dog"],
       "condition": {"dogCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "二水标记囚笼,效果未知"
+        "storyText": "{dog}标记囚笼,效果未知"
       }
     },
     {
       "id": "cat-dog",
       "keyword": "猫+狗",
-      "aliases": ["猫+二水", "天一+狗", "天一+二水", "狗+猫", "二水+猫"],
+      "aliases": ["猫+{dog}", "{cat}+狗", "{cat}+{dog}", "狗+猫", "{dog}+猫"],
       "triggerBy": ["cat"],
       "condition": {"catCanMove": true, "dogCanMove": true},
       "effect": {
         "type": "damage",
         "target": "cat",
         "value": -1,
-        "storyText": "天一嘲讽二水身材,二人打架,天一惨败,生命值-1"
+        "storyText": "{cat}嘲讽{dog}身材,二人打架,{cat}惨败,生命值-1"
       }
     },
     {
       "id": "cat-turtle",
       "keyword": "猫+龟",
-      "aliases": ["猫+包子", "天一+龟", "天一+包子", "龟+猫", "包子+猫"],
+      "aliases": ["猫+{turtle}", "{cat}+龟", "{cat}+{turtle}", "龟+猫", "{turtle}+猫"],
       "triggerBy": ["cat"],
       "condition": {"catCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "天一嘲笑包子'长得奇怪',包子未理会"
+        "storyText": "{cat}嘲笑{turtle}'长得奇怪',{turtle}未理会"
       }
     },
     {
       "id": "dog-turtle",
       "keyword": "狗+龟",
-      "aliases": ["狗+包子", "二水+龟", "二水+包子", "龟+狗", "包子+狗"],
+      "aliases": ["狗+{turtle}", "{dog}+龟", "{dog}+{turtle}", "龟+狗", "{turtle}+狗"],
       "triggerBy": ["dog"],
       "condition": {"dogCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "二水感谢包子救自己,约定共同弄清处境"
+        "storyText": "{dog}感谢{turtle}救自己,约定共同弄清处境"
       }
     },
     {
       "id": "dog-cat-bond",
       "keyword": "狗+猫",
-      "aliases": ["二水+猫", "二水+天一"],
+      "aliases": ["{dog}+猫", "{dog}+{cat}"],
       "triggerBy": ["dog"],
       "condition": {"dogCanMove": true, "catCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "二水与天一互感'眼熟',认为有特殊羁绊"
+        "storyText": "{dog}与{cat}互感'眼熟',认为有特殊羁绊"
       }
     },
     {
       "id": "turtle-cat-urge",
       "keyword": "龟+猫",
-      "aliases": ["包子+猫", "包子+天一"],
+      "aliases": ["{turtle}+猫", "{turtle}+{cat}"],
       "triggerBy": ["turtle"],
       "condition": {"catCanMove": true},
       "effect": {
         "type": "story",
-        "storyText": "包子督促天一行动,天一吐槽包子是'装货'"
+        "storyText": "{turtle}督促{cat}行动,{cat}吐槽{turtle}是'装货'"
       }
     },
     {
       "id": "turtle-dog-teach",
       "keyword": "龟+狗",
-      "aliases": ["包子+狗", "包子+二水"],
+      "aliases": ["{turtle}+狗", "{turtle}+{dog}"],
       "triggerBy": ["turtle"],
       "condition": {"dogCanMove": true},
       "effect": {
         "type": "heal",
         "target": "dog",
         "value": 1,
-        "storyText": "包子教二水强身方法,二水学会后生命值+1"
+        "storyText": "{turtle}教{dog}强身方法,{dog}学会后生命值+1"
       }
     }
   ],
