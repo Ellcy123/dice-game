@@ -557,6 +557,10 @@
           "computer",
           "cage",
           "big-door"
+        ],
+        "addToInventory": [
+          "vase",
+          "computer"
         ]
       }
     },

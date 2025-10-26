@@ -313,6 +313,13 @@ function applyEffect(effect, gameState, players, roomId, io, currentPlayerId = n
         });
       }
 
+      // 如果有 addToInventory，将这些物品添加到背包
+      if (effect.addToInventory && Array.isArray(effect.addToInventory)) {
+        effect.addToInventory.forEach(itemId => {
+          gameState.inventory[itemId] = true;
+        });
+      }
+
       results.changes.push({
         type: 'areas_discovered',
         areas: areasToDiscover
