@@ -448,6 +448,7 @@ function updateUI() {
     renderAreas();
     updateLetters();
     updateInventory();
+    updateSuitcaseButton();
     updateDoorSection();
 }
 
@@ -489,6 +490,24 @@ function updateInventory() {
             }
         });
     }
+}
+
+// 更新行李箱按钮显示状态
+function updateSuitcaseButton() {
+    const suitcaseButton = document.getElementById('suitcaseButton');
+    const discoveredAreas = gameState.discoveredAreas || [];
+
+    // 当行李箱已被发现（被龟触发过）时显示按钮
+    if (discoveredAreas.includes('suitcase')) {
+        suitcaseButton.style.display = 'block';
+    } else {
+        suitcaseButton.style.display = 'none';
+    }
+}
+
+// 打开行李箱面板
+function openSuitcasePanel() {
+    showSuitcasePasswordModal();
 }
 
 // 更新大门区域
